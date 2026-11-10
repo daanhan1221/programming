@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyVerse - 파이썬 프로그래밍 개념 & 퀴즈 마스터</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0B0F19',
+                            card: '#161F33',
+                            border: '#2A3654',
+                            accent: '#6366F1',
+                            neon: '#06B6D4',
+                            success: '#10B981',
+                            warning: '#F59E0B',
+                            danger: '#EF4444'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Pretendard', 'Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for sleek icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        /* Custom Glowing & Glassmorphism effects */
+        .glass-panel {
+            background: rgba(22, 31, 51, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .neon-border:hover {
+            border-color: #06B6D4;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0B0F19;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2A3654;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #6366F1;
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-brand-dark text-slate-200 font-sans antialiased min-h-screen flex flex-col custom-scrollbar overflow-x-hidden selection:bg-brand-accent selection:text-white">
+
+    <!-- Ambient Glowing Backgrounds -->
+    <div class="glow-effect top-0 left-1/4"></div>
+    <div class="glow-effect bottom-10 right-10"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-accent to-brand-neon flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-code"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-brand-neon">PyVerse</span>
+                    <span class="hidden sm:inline-block text-xs text-brand-neon px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-800/50 ml-2">High-Tech Learn Hub</span>
+                </div>
+            </div>
+
+            <!-- Main Tabs Nav -->
+            <nav class="flex space-x-1 sm:space-x-2 bg-slate-900/80 p-1 rounded-xl border border-brand-border">
+                <button id="nav-learn-btn" onclick="switchMainTab('learn')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-brand-accent text-white shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-book-open mr-2"></i>개념 학습
+                </button>
+                <button id="nav-quiz-btn" onclick="switchMainTab('quiz')" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-200">
+                    <i class="fa-solid fa-brain mr-2"></i>실력 테스트 퀴즈 (20문항)
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ================= SECTION 1: CONCEPT LEARNING HUB ================= -->
+        <div id="tab-learn" class="space-y-8">
+            <!-- Hero Banner -->
+            <div class="glass-panel rounded-2xl p-6 sm:p-8 relative overflow-hidden border border-brand-border/60 shadow-2xl">
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-brand-accent border border-indigo-500/20 mb-4">
+                        <i class="fa-solid fa-sparkles"></i> 2026 고등학교 프로그래밍 교과서 기반
+                    </span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight mb-4">
+                        파이썬 핵심 개념부터 <br class="hidden sm:inline"/>데이터 분석 라이브러리까지 완벽 정리
+                    </h1>
+                    <p class="text-slate-400 text-sm sm:text-base mb-6 leading-relaxed">
+                        변수, 자료형, 입출력, 연산자, 제어문, 함수, 파일 처리 및 데이터 분석(NumPy, Pandas, Matplotlib)에 이르는 체계적인 코딩 개념 가이드입니다. 왼쪽 메뉴에서 원하는 모듈을 선택해 자세히 학습해 보세요.
+                    </p>
+                </div>
+                <div class="absolute right-[-20px] bottom-[-20px] opacity-10 text-indigo-400 text-9xl pointer-events-none">
+                    <i class="fa-brands fa-python"></i>
+                </div>
+            </div>
+
+            <!-- Interactive Concept Explorer Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Left Sidebar Navigation for Topics -->
+                <div class="lg:col-span-1 space-y-2">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">학습 모듈 목차</h3>
+                    <div id="topic-menu-container" class="space-y-1">
+                        <!-- Topic buttons populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Right Detail Panel -->
+                <div class="lg:col-span-3">
+                    <div id="topic-detail-card" class="glass-panel rounded-2xl p-6 sm:p-8 border border-brand-border min-h-[500px]">
+                        <!-- Content dynamically loaded -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================= SECTION 2: 20-QUESTION QUIZ SYSTEM ================= -->
+        <div id="tab-quiz" class="hidden space-y-8">
+            <!-- Quiz Dashboard Header -->
+            <div class="glass-panel rounded-2xl p-6 border border-brand-border flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-brand-neon"></i> 프로그래밍 개념 점검 마스터 퀴즈
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">
+                        교과서 및 실무 개념 기반 총 20개의 핵심 문제를 풀고 실력을 검증해 보세요!
+                    </p>
+                </div>
+
+                <!-- Progress Scoreboard -->
+                <div class="flex items-center gap-6 bg-slate-900/90 px-6 py-3 rounded-xl border border-slate-800">
+                    <div class="text-center">
+                        <span class="text-xs text-slate-400 block uppercase tracking-wider">진행도</span>
+                        <span id="quiz-progress-text" class="text-lg font-bold text-brand-neon">1 / 20</span>
+                    </div>
+                    <div class="h-8 w-px bg-slate-800"></div>
+                    <div class="text-center">
+                        <span class="text-xs text-slate-400 block uppercase tracking-wider">현재 점수</span>
+                        <span id="quiz-score-text" class="text-lg font-bold text-brand-success">0점</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Main Box -->
+            <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-brand-border shadow-2xl relative min-h-[450px]" id="quiz-container">
+                <!-- Dynamic Quiz Content renders here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-brand-border/60 bg-slate-950/80 backdrop-blur-md py-6 text-center text-slate-500 text-sm">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-success animate-pulse"></span>
+                <span class="text-xs text-slate-400 font-mono">PyVerse Interactive Engine v2.4</span>
+            </div>
+            <p class="font-semibold text-slate-400">
+                Copyright 2026. HDA All rights reserved.
+            </p>
+            <div class="text-xs text-slate-500">
+                Designed with High-Precision UI/UX
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        /* --------------------------------------------------
+         * DATA: CONCEPT CONTENT (From Textbook & Web)
+         * -------------------------------------------------- */
+        const conceptTopics = [
+            {
+                id: 'concept-1',
+                title: '01. 변수와 자료형',
+                icon: 'fa-cube',
+                summary: '메모리 공간과 데이터의 형태 체계',
+                content: `
+                    <h2 class="text-2xl font-bold text-white mb-4 border-b border-slate-800 pb-3 flex items-center gap-3">
+                        <i class="fa-solid fa-cube text-brand-neon"></i> 변수(Variable) & 자료형(Data Type)
+                    </h2>
+                    
+                    <div class="space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed">
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                            <h3 class="text-indigo-400 font-bold mb-2 text-base"><i class="fa-solid fa-circle-info mr-2"></i>변수(Variable)란?</h3>
+                            <p>변수는 프로그래밍 내에서 <strong>자료값이 저장된 메모리 공간을 가리키는 객체(Object)</strong>입니다. 수학의 미지수와 달리 우변의 값을 좌변의 메모리 식별자에 대입하는(Assign) 역할을 합니다.</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">1. 파이썬 기본 자료형 & 특성</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                                    <span class="text-brand-neon font-bold">정수형 (int)</span>
+                                    <p class="text-xs text-slate-400 mt-1">양/음의 정수 및 0. 컴퓨터 메모리가 허용하는 한 크기 제한이 없음.</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                                    <span class="text-brand-neon font-bold">실수형 (float)</span>
+                                    <p class="text-xs text-slate-400 mt-1">소수점이 포함된 숫자 (예: 3.14, 2.3e10 지수표기법 지원).</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                                    <span class="text-brand-neon font-bold">문자열 (str)</span>
+                                    <p class="text-xs text-slate-400 mt-1">작은/큰따옴표로 둘러싸인 문자들의 집합 (불변 시퀀스).</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                                    <span class="text-brand-neon font-bold">논리형 (bool)</span>
+                                    <p class="text-xs text-slate-400 mt-1">참(True - 1)과 거짓(False - 0)을 나타내는 int의 하위 클래스.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">2. 가변(Mutable) vs 불변(Immutable) 자료형</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-800 text-slate-300">
+                                            <th class="p-3 border border-slate-700">구분</th>
+                                            <th class="p-3 border border-slate-700">특징</th>
+                                            <th class="p-3 border border-slate-700">해당 자료형</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="p-3 border border-slate-800 font-bold text-brand-warning">불변 (Immutable)</td>
+                                            <td class="p-3 border border-slate-800">생성 후 객체 내부 값을 수정할 수 없음</td>
+                                            <td class="p-3 border border-slate-800">int, float, bool, str, tuple</td>
+                                        </tr>
+                                        <tr class="bg-slate-900/40">
+                                            <td class="p-3 border border-slate-800 font-bold text-brand-success">가변 (Mutable)</td>
+                                            <td class="p-3 border border-slate-800">생성 후에도 요소 추가, 수정, 삭제 가능</td>
+                                            <td class="p-3 border border-slate-800">list, dict, set</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300">
+                            <div class="text-slate-500 mb-1"># 파이썬 대표 변수 조작 예시</div>
+                            <div>x, y, z = 10, 20, 30 <span class="text-slate-500"># 다중 대입</span></div>
+                            <div>a, b = b, a <span class="text-slate-500"># 두 변수의 값 교환(Swapping)</span></div>
+                            <div>print(type(x), id(x)) <span class="text-slate-500"># 자료형 및 메모리 고유 ID 확인</span></div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'concept-2',
+                title: '02. 입력과 출력 (I/O)',
+                icon: 'fa-right-to-bracket',
+                summary: '표준 입출력 및 이스케이프 문자',
+                content: `
+                    <h2 class="text-2xl font-bold text-white mb-4 border-b border-slate-800 pb-3 flex items-center gap-3">
+                        <i class="fa-solid fa-right-to-bracket text-brand-neon"></i> 입력(Input)과 출력(Output)
+                    </h2>
+
+                    <div class="space-y-6 text-slate-300 text-sm sm:text-base">
+                        <p>프로그램은 표준 입력 장치(키보드)를 통해 데이터를 전달받고, 표준 출력 장치(모니터)를 통해 처리된 결과를 보여줍니다.</p>
+
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="text-white font-bold"><i class="fa-solid fa-keyboard text-brand-accent mr-2"></i>1. input() 표준 입력 함수</h3>
+                            <p class="text-xs sm:text-sm text-slate-400">키보드로 데이터를 받아올 때 사용하며, <strong>입력받은 결과는 항상 '문자열(str)' 형식</strong>으로 반환됩니다. 계산을 위해서는 적절한 형 변환(Casting)이 필요합니다.</p>
+                            <div class="font-mono text-xs bg-slate-950 p-3 rounded-lg text-emerald-400">
+                                age = int(input("나이를 입력하세요: ")) # 정수로 형 변환<br/>
+                                a, b = map(int, input("두 정수 입력: ").split()) # map으로 여러 값 일괄 변환
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="text-white font-bold"><i class="fa-solid fa-desktop text-brand-neon mr-2"></i>2. print() 표준 출력 옵션</h3>
+                            <ul class="list-disc list-inside text-xs sm:text-sm text-slate-300 space-y-1">
+                                <li><code class="text-cyan-300 font-mono">sep</code>: 여러 항목을 출력할 때 사이사이에 넣을 구분자 (기본값: 공백)</li>
+                                <li><code class="text-cyan-300 font-mono">end</code>: 모든 출력을 마친 후 끝에 출력할 문자 (기본값: 개행 문자인 <code class="text-emerald-400">\n</code>)</li>
+                            </ul>
+                            <div class="font-mono text-xs bg-slate-950 p-3 rounded-lg text-emerald-400">
+                                print(123, 456, sep='-', end='!\n') # 출력: 123-456!
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">3. 주요 이스케이프 문자 (Escape Sequence)</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs">
+                                <div class="bg-slate-800/60 p-2 rounded border border-slate-700"><span class="text-brand-neon">\n</span> : 줄 바꿈</div>
+                                <div class="bg-slate-800/60 p-2 rounded border border-slate-700"><span class="text-brand-neon">\t</span> : 탭 간격</div>
+                                <div class="bg-slate-800/60 p-2 rounded border border-slate-700"><span class="text-brand-neon">\\</span> : 역슬래시 자체</div>
+                                <div class="bg-slate-800/60 p-2 rounded border border-slate-700"><span class="text-brand-neon">\' / \"</span> : 따옴표 표현</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'concept-3',
+                title: '03. 연산자 (Operators)',
+                icon: 'fa-calculator',
+                summary: '산술, 비교, 논리, 비트 연산자 및 우선순위',
+                content: `
+                    <h2 class="text-2xl font-bold text-white mb-4 border-b border-slate-800 pb-3 flex items-center gap-3">
+                        <i class="fa-solid fa-calculator text-brand-neon"></i> 연산자 (Operators)
+                    </h2>
+
+                    <div class="space-y-6 text-slate-300 text-sm sm:text-base">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                                <h3 class="font-bold text-white mb-2">산술 연산자 (Arithmetic)</h3>
+                                <ul class="font-mono text-xs text-slate-300 space-y-1">
+                                    <li><span class="text-indigo-400">+ , - , *</span> : 사칙 연산</li>
+                                    <li><span class="text-indigo-400">/</span> : 나눗셈 (결과는 항상 실수 float)</li>
+                                    <li><span class="text-indigo-400">//</span> : 나눗셈의 몫 (int)</li>
+                                    <li><span class="text-indigo-400">%</span> : 나눗셈의 나머지</li>
+                                    <li><span class="text-indigo-400">**</span> : 제곱 (예: 2**3 = 8)</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                                <h3 class="font-bold text-white mb-2">비교 & 논리 연산자</h3>
+                                <ul class="font-mono text-xs text-slate-300 space-y-1">
+                                    <li><span class="text-emerald-400">== , !=</span> : 같다, 다르다</li>
+                                    <li><span class="text-emerald-400">< , <= , > , >=</span> : 크기 비교</li>
+                                    <li><span class="text-emerald-400">and</span> : 둘 다 참일 때 True</li>
+                                    <li><span class="text-emerald-400">or</span> : 하나 이상 참일 때 True</li>
+                                    <li><span class="text-emerald-400">not</span> : 참/거짓 반전</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-white mb-2">비트 연산자 (Bitwise)</h3>
+                            <p class="text-xs text-slate-400 mb-2">정수의 이진수(Binary) 비트 단위 연산을 수행합니다.</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs text-center">
+                                <div class="bg-slate-800 p-2 rounded"><span class="text-amber-400">&</span> (Bitwise AND)</div>
+                                <div class="bg-slate-800 p-2 rounded"><span class="text-amber-400">|</span> (Bitwise OR)</div>
+                                <div class="bg-slate-800 p-2 rounded"><span class="text-amber-400">^</span> (Bitwise XOR)</div>
+                                <div class="bg-slate-800 p-2 rounded"><span class="text-amber-400">~</span> (Bitwise NOT)</div>
+                                <div class="bg-slate-800 p-2 rounded col-span-2"><span class="text-amber-400"><<</span> (Left Shift)</div>
+                                <div class="bg-slate-800 p-2 rounded col-span-2"><span class="text-amber-400">>></span> (Right Shift)</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'concept-4',
+                title: '04. 제어문 (Control Flow)',
+                icon: 'fa-code-branch',
+                summary: '조건문(if-elif-else)과 반복문(for, while)',
+                content: `
+                    <h2 class="text-2xl font-bold text-white mb-4 border-b border-slate-800 pb-3 flex items-center gap-3">
+                        <i class="fa-solid fa-code-branch text-brand-neon"></i> 제어문 (Control Structures)
+                    </h2>
+
+                    <div class="space-y-6 text-slate-300 text-sm sm:text-base">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">1. 조건 선택문 (if - elif - else)</h3>
+                            <p class="text-xs text-slate-400 mb-2">조건의 참/거짓에 따라 실행 흐름을 제어합니다. 파이썬에서는 <strong>들여쓰기(Indentation - 공백 4칸 또는 1탭)</strong>가 코드 블록을 구분하는 필수 규칙입니다.</p>
+                            <div class="font-mono text-xs bg-slate-900 p-4 rounded-xl border border-slate-800 text-cyan-300">
+                                score = 85<br/>
+                                if score >= 90:<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;print("A 등급")<br/>
+                                elif score >= 80:<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;print("B 등급") # 실행됨<br/>
+                                else:<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;print("C 등급 이하")
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">2. 반복문 (for & while)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                                    <h4 class="font-bold text-brand-accent mb-2">for 문 (시퀀스/범위 반복)</h4>
+                                    <div class="font-mono text-xs text-emerald-400">
+                                        for i in range(1, 6):<br/>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;print(i, end=' ')<br/>
+                                        # 1 2 3 4 5
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                                    <h4 class="font-bold text-brand-neon mb-2">while 문 (조건 기반 반복)</h4>
+                                    <div class="font-mono text-xs text-emerald-400">
+                                        n = 0<br/>
+                                        while n < 3:<br/>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;n += 1<br/>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;print(n) # 1, 2, 3
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700">
+                            <h4 class="font-bold text-white text-sm mb-1"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i>반복문 제어 키워드</h4>
+                            <p class="text-xs text-slate-300">
+                                <code class="text-red-400 font-mono">break</code>: 반복문을 즉시 탈출합니다.<br/>
+                                <code class="text-yellow-400 font-mono">continue</code>: 남은 명령문을 스킵하고 다음 반복 단계로 바로 이동합니다.
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'concept-5',
+                title: '05. 함수 (Functions)',
+                icon: 'fa-gears',
+                summary: '사용자 정의 함수, 변수 스코프, Lambda',
+                content: `
+                    <h2 class="text-2xl font-bold text-white mb-4 border-b border-slate-800 pb-3 flex items-center gap-3">
+                        <i class="fa-solid fa-gears text-brand-neon"></i> 함수 (Functions)
+                    </h2>
+
+                    <div class="space-y-6 text-slate-300 text-sm sm:text-base">
+                        <p>함수는 일정한 동작을 수행하는 코드 블록으로, 코드의 재사용성과 가독성을 획기적으로 향상시킵니다.</p>
+
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-white">1. 사용자 정의 함수 (def)</h3>
+                            <div class="font-mono text-xs bg-slate-950 p-3 rounded-lg text-emerald-400">
+                                def add_numbers(a, b=10): # b는 기본 매개변수<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;"""두 수의 합을 계산하여 반환"""<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;return a + b<br/><br/>
+                                print(add_numbers(5)) # 결과: 15<br/>
+                                print(add_numbers(5, 20)) # 결과: 25
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">2. 변수 스코프 (Scope)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700">
+                                    <span class="font-bold text-brand-neon">지역 변수 (Local Variable)</span>
+                                    <p class="text-slate-400 mt-1">함수 내부에서 생성되며, 함수가 종료되면 메모리에서 자동 소멸됩니다.</p>
+                                </div>
+                                <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700">
+                                    <span class="font-bold text-brand-accent">전역 변수 (Global Variable)</span>
+                                    <p class="text-slate-400 mt-1">프로그램 전체에서 접근 가능합니다. 함수 내 변경 시 <code class="text-amber-300">global</code> 키워드가 필요합니다.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                            <h3 class="font-bold text-white mb-2">3. 람다 함수 (Lambda)</h3>
+                            <p class="text-xs text-slate-400 mb-2">한 줄로 간결하게 선언하는 익명 함수입니다.</p>
+                            <div class="font-mono text-xs text-cyan-300">
+                                square = lambda x: x ** 2<br/>
+                                print(square(4)) # 16
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'concept-6',
+                title: '06. 파일 처리 & 라이브러리',
+                icon: 'fa-file-code',
+                summary: '파일 입출력과 데이터 분석(NumPy/Pandas/Matplotlib)',
+                content: `
+                    <h2 class="text-2xl font-bold text-white mb-4 border-b border-slate-800 pb-3 flex items-center gap-3">
+                        <i class="fa-solid fa-file-code text-brand-neon"></i> 파일 입출력 & 데이터 분석 라이브러리
+                    </h2>
+
+                    <div class="space-y-6 text-slate-300 text-sm sm:text-base">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">1. 파일 처리 (File I/O)</h3>
+                            <p class="text-xs text-slate-400 mb-2"><code class="text-cyan-300 font-mono">with open()</code> 구문을 사용하면 파일 작업을 마친 후 자원이 자동 해제(close)됩니다.</p>
+                            <div class="font-mono text-xs bg-slate-900 p-3 rounded-xl border border-slate-800 text-emerald-400">
+                                # 파일 쓰기 (Write)<br/>
+                                with open('data.txt', 'w', encoding='utf-8') as f:<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;f.write('Hello PyVerse!\n')<br/><br/>
+                                # 파일 읽기 (Read)<br/>
+                                with open('data.txt', 'r', encoding='utf-8') as f:<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;content = f.read()<br/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;print(content)
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2">2. 파이썬 데이터 분석 3대 라이브러리</h3>
+                            <div class="space-y-3">
+                                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                    <span class="font-bold text-emerald-400">NumPy (넘파이)</span>
+                                    <p class="text-xs text-slate-400 mt-1">고성능 다차원 배열(ndarray) 수치 계산 및 행렬 내적 연산 제공.</p>
+                                </div>
+                                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                    <span class="font-bold text-cyan-400">Pandas (판다스)</span>
+                                    <p class="text-xs text-slate-400 mt-1">1차원 Series 및 2차원 DataFrame 표 형식 구조를 통한 데이터 가공/분석.</p>
+                                </div>
+                                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                    <span class="font-bold text-indigo-400">Matplotlib (맷플롯립)</span>
+                                    <p class="text-xs text-slate-400 mt-1">라인 차트, 막대그래프, 파이 차트, 히스토그램 시각화 라이브러리.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        /* --------------------------------------------------
+         * DATA: 20 QUIZ QUESTIONS WITH RATIONALES
+         * -------------------------------------------------- */
+        const quizQuestions = [
+            {
+                id: 1,
+                question: "파이썬에서 변수에 값을 저장할 때 사용하는 등호('=')의 정확한 의미는 무엇인가요?",
+                options: [
+                    "좌변과 우변의 값이 완전히 서로 같음을 의미한다.",
+                    "우변의 값이나 객체 주소를 좌변 변수에 할당(대입)한다.",
+                    "좌변과 우변을 비교하여 논리값 True/False를 반환한다.",
+                    "우변의 값을 메모리에서 완전히 삭제하고 새로 생성한다."
+                ],
+                answer: 1,
+                rationale: "프로그래밍에서의 등호(=)는 우변의 자릿값이나 객체의 메모리 주소를 좌변의 변수 이름에 연결하는 대입(Assignment) 역할을 합니다. 같음을 비교할 때는 '==' 연산자를 사용합니다."
+            },
+            {
+                id: 2,
+                question: "다음 파이썬 자료형 중 '가변(Mutable) 자료형'에 해당하는 것은 무엇인가요?",
+                options: [
+                    "정수형 (int)",
+                    "문자열 (str)",
+                    "리스트 (list)",
+                    "튜플 (tuple)"
+                ],
+                answer: 2,
+                rationale: "리스트(list), 딕셔너리(dict), 집합(set)은 생성 후에도 요소를 변경/추가/삭제할 수 있는 가변(Mutable) 자료형입니다. 정수, 실수, 문자열, 튜플은 불변(Immutable) 자료형입니다."
+            },
+            {
+                id: 3,
+                question: "다음 파이썬 코드의 실행 결과는 무엇인가요?\nprint(type(4 / 2))",
+                options: [
+                    "<class 'int'>",
+                    "<class 'float'>",
+                    "<class 'str'>",
+                    "<class 'bool'>"
+                ],
+                answer: 1,
+                rationale: "파이썬에서 나누기(/) 연산자의 결과는 정수로 딱 떨어지더라도 항상 실수형(<class 'float'>)으로 반환됩니다. 정수 몫을 얻으려면 '//' 연산자를 써야 합니다."
+            },
+            {
+                id: 4,
+                question: "키보드로부터 사용자 입력을 받는 input() 함수에 대한 설명으로 옳은 것은?",
+                options: [
+                    "사용자가 숫자를 입력하면 자동으로 int 형으로 저장된다.",
+                    "입력받은 값은 입력 내용과 상관없이 항상 문자열(str)로 취급된다.",
+                    "input() 함수는 항상 0 또는 1의 정수만을 반환한다.",
+                    "입력받은 값을 계산하기 위해 형 변환을 할 필요가 전혀 없다."
+                ],
+                answer: 1,
+                rationale: "input() 표준 입력 함수는 키보드로 들어온 모든 값을 문자열(str) 형태로 받습니다. 따라서 수치 연산을 하려면 int()나 float() 함수로 형 변환해야 합니다."
+            },
+            {
+                id: 5,
+                question: "다음 코드의 출력 결과로 올바른 것은?\nprint(17 % 5, 17 // 5)",
+                options: [
+                    "3.4 3",
+                    "2 3",
+                    "3 2",
+                    "2 3.4"
+                ],
+                answer: 1,
+                rationale: "% 연산자는 17을 5로 나눈 나머지인 2를 구하고, // 연산자는 17을 5로 나눈 정수 몫인 3을 구합니다."
+            },
+            {
+                id: 6,
+                question: "다음 연산식의 결과로 올바른 값은?\nTrue + True * False",
+                options: [
+                    "0",
+                    "1",
+                    "2",
+                    "TrueFalse"
+                ],
+                answer: 1,
+                rationale: "논리형(bool)에서 True는 1, False는 0의 정숫값을 가집니다. 연산자 우선순위에 의해 곱셈(True * False = 1 * 0 = 0)이 먼저 계산되고, 1 + 0 = 1 이 됩니다."
+            },
+            {
+                id: 7,
+                question: "파이썬 식별자(변수 이름) 작성 규칙 중 '잘못된' 설명은 무엇인가요?",
+                options: [
+                    "첫 글자는 숫자로 시작할 수 없으며 알파벳, 한글, 밑줄(_)로 시작해야 한다.",
+                    "대소문자를 구분하므로 myVar와 MyVar는 다른 변수이다.",
+                    "for, if, def와 같은 파이썬 예약어(Keyword)도 변수명으로 쓸 수 있다.",
+                    "특수 문자(+, -, *, /, @, % 등)는 변수 이름에 포함시킬 수 없다."
+                ],
+                answer: 2,
+                rationale: "파이썬 예약어(Keyword)는 언어 자체에서 특정 구문으로 사용하도록 약속되어 있으므로 변수 이름으로 사용할 수 없습니다."
+            },
+            {
+                id: 8,
+                question: "다음 파이썬 리스트 슬라이싱 결과는 무엇인가요?\na = [10, 20, 30, 40, 50]\nprint(a[1:4])",
+                options: [
+                    "[10, 20, 30]",
+                    "[20, 30, 40]",
+                    "[20, 30, 40, 50]",
+                    "[10, 20, 30, 40]"
+                ],
+                answer: 1,
+                rationale: "슬라이싱 [1:4]는 인덱스 1부터 (4-1)인 인덱스 3까지의 요소를 가져오므로 a[1], a[2], a[3]인 [20, 30, 40]이 됩니다."
+            },
+            {
+                id: 9,
+                question: "튜플(Tuple) 자료형에 대한 설명으로 옳지 않은 것은?",
+                options: [
+                    "요소들을 소괄호 () 로 감싸거나 따옴표 없이 콤마로 구분하여 생성한다.",
+                    "리스트와 달리 한 번 생성된 요솟값을 수정하거나 삭제할 수 없다.",
+                    "요소가 단 1개인 튜플을 만들 때는 (10,)처럼 뒤에 콤마를 붙여야 한다.",
+                    "튜플은 가변(Mutable) 자료형이므로 append() 메소드로 원소를 추가할 수 있다."
+                ],
+                answer: 3,
+                rationale: "튜플은 읽기 전용 불변(Immutable) 자료형이므로 append(), remove() 등의 수정 메소드를 지원하지 않습니다."
+            },
+            {
+                id: 10,
+                question: "다음 딕셔너리(dict) 조작 중 오류가 발생하는 문장은?",
+                options: [
+                    "d = {'name': '홍길동', 'age': 17}",
+                    "d['age'] = 18",
+                    "d[['a', 'b']] = 100",
+                    "d['city'] = '수원'"
+                ],
+                answer: 2,
+                rationale: "딕셔너리의 키(Key)는 값이 변하지 않는 불변(Immutable) 객체만 사용할 수 있습니다. 리스트는 가변 객체이므로 딕셔너리의 Key로 쓸 수 없어 TypeError가 발생합니다."
+            },
+            {
+                id: 11,
+                question: "다음 조건문에서 들여쓰기(Indentation)에 대한 파이썬 문법 설명으로 옳은 것은?",
+                options: [
+                    "들여쓰기는 단순히 코드 모양을 예쁘게 만들기 위한 권장 사항일 뿐이다.",
+                    "동일한 코드 블록 내에서는 반드시 들여쓰기 공백 간격이 일정해야 한다.",
+                    "if문 바로 아랫 줄은 들여쓰기를 하지 않아도 오류가 나지 않는다.",
+                    "파이썬은 중괄호 {} 로 코드 블록 구역을 구분한다."
+                ],
+                answer: 1,
+                rationale: "파이썬은 중괄호 대신 들여쓰기로 코드 블록 구역을 구분합니다. 따라서 동일한 블록 내에서 들여쓰기 간격이 다르면 IndentationError가 발생합니다."
+            },
+            {
+                id: 12,
+                question: "다음 for 반복문의 출력 결과로 올바른 것은?\nsum = 0\nfor i in range(1, 5):\n    sum += i\nprint(sum)",
+                options: [
+                    "10",
+                    "15",
+                    "5",
+                    "4"
+                ],
+                answer: 0,
+                rationale: "range(1, 5)는 [1, 2, 3, 4]를 생성합니다. 1 + 2 + 3 + 4 = 10 이 출력됩니다."
+            },
+            {
+                id: 13,
+                question: "반복문 내에서 '남은 루프 실행문을 건너뛰고 다음 반복 단계로 직행'하게 만드는 키워드는?",
+                options: [
+                    "break",
+                    "pass",
+                    "continue",
+                    "return"
+                ],
+                answer: 2,
+                rationale: "continue 문을 만나면 반복문의 아래쪽 코드를 실행하지 않고 즉시 다음 반복 순서의 시작 지점으로 이동합니다."
+            },
+            {
+                id: 14,
+                question: "함수 안에서 선언되어 함수가 종료되면 메모리에서 사라지는 변수를 무엇이라 하는가?",
+                options: [
+                    "전역 변수 (Global Variable)",
+                    "지역 변수 (Local Variable)",
+                    "매개 변수 (Parameter)",
+                    "정적 변수 (Static Variable)"
+                ],
+                answer: 1,
+                rationale: "함수 내부에서 정의된 변수를 지역 변수(Local Variable)라 하며, 해당 함수의 실행 범위(Scope) 내에서만 존재하다가 종료 시 자동 소멸합니다."
+            },
+            {
+                id: 15,
+                question: "다음 람다(lambda) 함수 표현식과 완전히 동일한 의미를 지닌 사용자 정의 함수는?\nf = lambda a, b: a * b",
+                options: [
+                    "def f(a, b): print(a * b)",
+                    "def f(a, b): return a * b",
+                    "def f(a, b): return a ** b",
+                    "lambda f(a, b): return a * b"
+                ],
+                answer: 1,
+                rationale: "람다 함수 'lambda a, b: a * b'는 두 인수를 받아 곱한 결과를 반환(return)하는 def f(a, b): return a * b 문장과 일치합니다."
+            },
+            {
+                id: 16,
+                question: "파일 처리 시 close() 함수를 별도로 호출하지 않아도 자동으로 파일을 닫아주는 파이썬 구문은?",
+                options: [
+                    "try - except 구문",
+                    "with open(...) as 구문",
+                    "for line in open(...) 구문",
+                    "while open(...) 구문"
+                ],
+                answer: 1,
+                rationale: "with open(...) as 파일객체: 구문 블록을 벗어나면 파이썬 인터프리터가 열려있는 파일 객체를 자동으로 close() 해 줍니다."
+            },
+            {
+                id: 17,
+                question: "파일 입출력 모드(Mode) 중 '기존 파일이 존재하면 내용을 덮어쓰지 않고 뒤에 덧붙이는 모드'는?",
+                options: [
+                    "'r' (Read)",
+                    "'w' (Write)",
+                    "'a' (Append)",
+                    "'x' (Exclusive Create)"
+                ],
+                answer: 2,
+                rationale: "'a' (Append) 모드는 파일이 없으면 새로 생성하고, 파일이 기존에 존재하면 파일의 끝부분에 데이터를 추가합니다."
+            },
+            {
+                id: 18,
+                question: "고성능 다차원 배열(ndarray) 객체와 수치 연산 기능을 제공하는 파이썬 핵심 데이터 분석 라이브러리는?",
+                options: [
+                    "NumPy",
+                    "Pandas",
+                    "Matplotlib",
+                    "Seaborn"
+                ],
+                answer: 0,
+                rationale: "NumPy(넘파이)는 고성능 수치 계산과 다차원 배열 연산을 처리하기 위해 개발된 오픈소스 과학 계산 라이브러리입니다."
+            },
+            {
+                id: 19,
+                question: "Pandas 라이브러리에서 2차원 표(Table) 형태의 데이터 구조를 나타내는 핵심 클래스는?",
+                options: [
+                    "Series",
+                    "DataFrame",
+                    "Array",
+                    "List"
+                ],
+                answer: 1,
+                rationale: "Pandas에서 1차원 배열 형태는 Series, 행과 열로 이루어진 2차원 표 구조는 DataFrame 클래스로 다룹니다."
+            },
+            {
+                id: 20,
+                question: "Matplotlib 라이브러리에서 선 그래프(Line Chart)를 그릴 때 사용하는 대표 함수는?",
+                options: [
+                    "plt.bar()",
+                    "plt.pie()",
+                    "plt.plot()",
+                    "plt.scatter()"
+                ],
+                answer: 2,
+                rationale: "Matplotlib.pyplot 모듈에서 plt.plot()은 선 그래프, plt.bar()는 막대그래프, plt.pie()는 원그래프, plt.scatter()는 산점도를 생성합니다."
+            }
+        ];
+
+        /* --------------------------------------------------
+         * APP STATE & CONTROLLERS
+         * -------------------------------------------------- */
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let selectedOptions = new Array(quizQuestions.length).fill(null);
+        let quizSubmitted = false;
+
+        // Initialize App on DOM Load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTopicSidebar();
+            loadTopicDetail('concept-1');
+            renderQuizQuestion(0);
+        });
+
+        // Tab Switching Logic
+        function switchMainTab(tab) {
+            const learnTab = document.getElementById('tab-learn');
+            const quizTab = document.getElementById('tab-quiz');
+            const learnBtn = document.getElementById('nav-learn-btn');
+            const quizBtn = document.getElementById('nav-quiz-btn');
+
+            if (tab === 'learn') {
+                learnTab.classList.remove('hidden');
+                quizTab.classList.add('hidden');
+                learnBtn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-brand-accent text-white shadow-lg shadow-indigo-500/20";
+                quizBtn.className = "px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-200";
+            } else {
+                learnTab.classList.add('hidden');
+                quizTab.classList.remove('hidden');
+                quizBtn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-brand-accent text-white shadow-lg shadow-indigo-500/20";
+                learnBtn.className = "px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-200";
+            }
+        }
+
+        /* --------------------------------------------------
+         * CONCEPT LEARNING RENDERER
+         * -------------------------------------------------- */
+        function renderTopicSidebar() {
+            const container = document.getElementById('topic-menu-container');
+            container.innerHTML = conceptTopics.map(topic => `
+                <button id="btn-${topic.id}" onclick="loadTopicDetail('${topic.id}')" 
+                        class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-3 border border-transparent hover:bg-slate-800/80 text-slate-400 hover:text-white">
+                    <i class="fa-solid ${topic.icon} text-brand-neon"></i>
+                    <div>
+                        <div class="font-bold text-slate-200">${topic.title}</div>
+                        <div class="text-[11px] text-slate-500 truncate">${topic.summary}</div>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function loadTopicDetail(topicId) {
+            const topic = conceptTopics.find(t => t.id === topicId);
+            if (!topic) return;
+
+            // Highlight Active Button
+            conceptTopics.forEach(t => {
+                const btn = document.getElementById(`btn-${t.id}`);
+                if (t.id === topicId) {
+                    btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-3 bg-slate-800 border border-brand-neon/40 text-white shadow-lg shadow-cyan-500/10";
+                } else {
+                    btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-3 border border-transparent hover:bg-slate-800/80 text-slate-400 hover:text-white";
+                }
+            });
+
+            // Load Content into panel
+            document.getElementById('topic-detail-card').innerHTML = topic.content;
+        }
+
+        /* --------------------------------------------------
+         * QUIZ ENGINE LOGIC
+         * -------------------------------------------------- */
+        function renderQuizQuestion(index) {
+            currentQuizIndex = index;
+            const q = quizQuestions[index];
+            const container = document.getElementById('quiz-container');
+            const isSelected = selectedOptions[index] !== null;
+
+            document.getElementById('quiz-progress-text').innerText = `${index + 1} / ${quizQuestions.length}`;
+            document.getElementById('quiz-score-text').innerText = `${quizScore}점`;
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Question Header -->
+                    <div class="flex items-start justify-between gap-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-cyan-950 text-brand-neon border border-cyan-800">
+                            문제 Q${q.id}
+                        </span>
+                        <span class="text-xs text-slate-400">객관식 (4지선다)</span>
+                    </div>
+
+                    <!-- Question Text -->
+                    <h3 class="text-lg sm:text-xl font-bold text-white whitespace-pre-line leading-relaxed">
+                        ${q.question}
+                    </h3>
+
+                    <!-- Options Grid -->
+                    <div class="space-y-3 pt-2">
+                        ${q.options.map((opt, optIdx) => {
+                            let btnStyle = "bg-slate-900/90 border-slate-800 hover:border-slate-700 text-slate-300";
+                            let icon = `<span class="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center text-xs text-slate-400 font-bold">${optIdx + 1}</span>`;
+
+                            if (selectedOptions[index] === optIdx) {
+                                if (optIdx === q.answer) {
+                                    btnStyle = "bg-emerald-950/80 border-emerald-500 text-emerald-200 shadow-lg shadow-emerald-500/10";
+                                    icon = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>`;
+                                } else {
+                                    btnStyle = "bg-rose-950/80 border-rose-500 text-rose-200 shadow-lg shadow-rose-500/10";
+                                    icon = `<i class="fa-solid fa-circle-xmark text-rose-400 text-lg"></i>`;
+                                }
+                            } else if (isSelected && optIdx === q.answer) {
+                                btnStyle = "bg-emerald-950/40 border-emerald-600/60 text-emerald-300";
+                                icon = `<i class="fa-solid fa-check text-emerald-500 text-sm"></i>`;
+                            }
+
+                            return `
+                                <button onclick="selectAnswer(${index}, ${optIdx})" 
+                                        ${isSelected ? 'disabled' : ''}
+                                        class="w-full text-left p-4 rounded-xl border text-sm sm:text-base font-medium transition-all duration-200 flex items-center justify-between gap-3 ${btnStyle}">
+                                    <span>${opt}</span>
+                                    <div>${icon}</div>
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <!-- Answer Rationale Box (Visible after answer selection) -->
+                    ${isSelected ? `
+                        <div class="mt-6 p-4 rounded-xl ${selectedOptions[index] === q.answer ? 'bg-emerald-950/40 border border-emerald-800/60' : 'bg-slate-900 border border-slate-800'} space-y-2">
+                            <div class="flex items-center gap-2 font-bold text-sm ${selectedOptions[index] === q.answer ? 'text-emerald-400' : 'text-amber-400'}">
+                                <i class="fa-solid fa-lightbulb"></i> 해설 및 개념 정립
+                            </div>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                                ${q.rationale}
+                            </p>
+                        </div>
+                    ` : ''}
+
+                    <!-- Navigation Footer -->
+                    <div class="flex items-center justify-between pt-6 border-t border-slate-800">
+                        <button onclick="renderQuizQuestion(${index - 1})" 
+                                ${index === 0 ? 'disabled class="opacity-40 cursor-not-allowed px-4 py-2 rounded-lg text-sm text-slate-500 bg-slate-900"' : 'class="px-4 py-2 rounded-lg text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all"'}>
+                            <i class="fa-solid fa-arrow-left mr-2"></i> 이전 문제
+                        </button>
+
+                        ${index === quizQuestions.length - 1 ? `
+                            <button onclick="finishQuiz()" class="px-6 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-brand-accent to-brand-neon text-white shadow-lg shadow-indigo-500/20 hover:opacity-90 transition-all">
+                                퀴즈 결과 확인 <i class="fa-solid fa-flag-checkered ml-2"></i>
+                            </button>
+                        ` : `
+                            <button onclick="renderQuizQuestion(${index + 1})" class="px-4 py-2 rounded-lg text-sm font-semibold bg-brand-accent hover:bg-indigo-600 text-white transition-all shadow-md">
+                                다음 문제 <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectAnswer(qIndex, optIndex) {
+            if (selectedOptions[qIndex] !== null) return;
+
+            selectedOptions[qIndex] = optIndex;
+            if (optIndex === quizQuestions[qIndex].answer) {
+                quizScore += 5; // 20 questions * 5 points = 100 max
+            }
+            renderQuizQuestion(qIndex);
+        }
+
+        function finishQuiz() {
+            const container = document.getElementById('quiz-container');
+            const totalQuestions = quizQuestions.length;
+            const correctCount = selectedOptions.filter((opt, idx) => opt === quizQuestions[idx].answer).length;
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+
+            container.innerHTML = `
+                <div class="text-center py-8 space-y-6 max-w-xl mx-auto">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-brand-accent to-brand-neon flex items-center justify-center text-white text-3xl shadow-xl shadow-cyan-500/20">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white">퀴즈 세션 완료!</h2>
+                        <p class="text-slate-400 text-sm mt-2">수고하셨습니다! 파이썬 개념 실력 점검 결과입니다.</p>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                        <div>
+                            <span class="text-xs text-slate-500 block">총 점수</span>
+                            <span class="text-2xl font-black text-brand-neon">${quizScore}점</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500 block">정답 수</span>
+                            <span class="text-2xl font-black text-brand-success">${correctCount} / ${totalQuestions}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500 block">정답률</span>
+                            <span class="text-2xl font-black text-indigo-400">${percentage}%</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex items-center justify-center gap-4">
+                        <button onclick="resetQuiz()" class="px-6 py-3 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-white transition-all">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> 퀴즈 다시 풀기
+                        </button>
+                        <button onclick="switchMainTab('learn')" class="px-6 py-3 rounded-xl font-bold bg-brand-accent hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all">
+                            <i class="fa-solid fa-book-open mr-2"></i> 개념 재학습하기
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetQuiz() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            selectedOptions = new Array(quizQuestions.length).fill(null);
+            renderQuizQuestion(0);
+        }
+    </script>
+</body>
+</html>
