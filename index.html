@@ -1,1259 +1,858 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  BookOpen, 
-  HelpCircle, 
-  Code, 
-  Award, 
-  ChevronRight, 
-  CheckCircle2, 
-  XCircle, 
-  RotateCcw, 
-  Play, 
-  Sparkles, 
-  Terminal, 
-  Copy, 
-  Check, 
-  Clock, 
-  Zap, 
-  Sliders, 
-  BookMarked,
-  Cpu,
-  Layers,
-  FileCode,
-  Lightbulb,
-  ArrowRight,
-  BookCheck
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Mastery Hub - 파이썬 기초 마스터</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel Standalone (JSX Compiler) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        code, pre, textarea { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500 selection:text-black">
+    <div id="root"></div>
 
-// --- DATA: TOPICS, CONCEPTS & 120 QUIZZES ---
-const TOPICS_DATA = [
-  {
-    id: 'variables',
-    title: '1. 변수와 자료형',
-    sub: 'Variables & Data Types',
-    icon: Cpu,
-    color: 'from-cyan-500 to-blue-600',
-    accentColor: 'cyan',
-    concepts: [
-      {
-        title: '🌱 쉬운 개념: ① 변수(Variable)와 식별자',
-        content: `• **변수란?**: 자룟값(데이터)을 저장하는 메모리 공간을 가리키는 이름(그릇)입니다.
-• **대입 연산자 (\`=\`)**: 우변의 값 또는 계산 결과를 좌변의 변수에 저장(할당)합니다. (수학의 '같다'와는 다른 의미입니다.)
-• **변수 명명 규칙**:
-  - 알파벳, 숫자, 밑줄(\`_\`), 한글 조합 가능 (숫자로 시작 불가능)
-  - 대소문자를 구분하며, 예약어(예: \`if\`, \`for\`, \`def\` 등)는 변수명으로 사용할 수 없습니다.
-• **주요 내장 함수**:
-  - \`type(변수)\`: 변수에 저장된 객체의 자료형 확인
-  - \`id(변수)\`: 객체의 고유한 메모리 주소값 확인
-  - \`del 변수\`: 변수와 객체의 연결을 끊고 삭제`,
-        code: `x = 10
-y = "파이썬"
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
 
-print(type(x))  # <class 'int'>
-print(type(y))  # <class 'str'>
-print(id(x))    # 메모리 주소 확인`
-      },
-      {
-        title: '🌱 쉬운 개념: ② 기본 자료형 & ③ 컨테이너 자료 구조',
-        content: `■ **기본 자료형 (Basic Data Types):**
-- **정수형 (\`int\`)**: 소수점이 없는 양수, 음수, 0 (예: \`10\`, \`-5\`, \`0\`)
-- **실수형 (\`float\`)**: 소수점이 포함된 숫자 (예: \`3.14\`, \`12.3\`)
-- **논리형 (\`bool\`)**: 참(\`True\`) 또는 거짓(\`False\`)만을 나타내는 자료형
-- **복소수형 (\`complex\`)**: 실수부와 허수부(\`j\` 또는 \`J\`)의 합으로 표현 (예: \`3 + 4j\`)
-
-■ **컨테이너 자료 구조 요약:**
-- **가변 자료형(Mutable)**: 생성 후 내부 값을 변경할 수 있음 (\`list\`, \`dict\`, \`set\`)
-- **불변 자료형(Immutable)**: 생성 후 내부 값을 변경할 수 없음 (\`int\`, \`float\`, \`bool\`, \`str\`, \`tuple\`)
-
-1) **문자열 (\`str\`)**: 큰따옴표나 작은따옴표로 감싸서 작성. \`upper()\`, \`lower()\`, \`split()\`, \`join()\` 제공.
-2) **리스트 (\`list\`)**: 대괄호 \`[]\` 사용. 순서가 있고 요소를 자유롭게 변경 가능 (\`append()\`, \`pop()\`, \`sort()\`).
-3) **튜플 (\`tuple\`)**: 소괄호 \`()\` 사용. 수정 불가능한 읽기 전용 구조 (원소 1개일 때 \`(1,)\` 쉼표 필수).
-4) **딕셔너리 (\`dict\`)**: 중괄호 \`{}\` 사용. **키(Key)와 값(Value)**이 한 쌍을 이룸 (\`d[key] = value\`).
-5) **집합 (\`set\`)**: 순서가 없고 중복을 허용하지 않음 (\`|\` 합집합, \`&\` 교집합, \`-\` 차집합).`,
-        code: `# 자료 구조 종합 예시
-my_list = [1, 2, 3]
-my_tuple = (1, 2, 3)
-my_dict = {"name": "철수", "age": 17}
-my_set = {1, 2, 2, 3}  # 중복 자동 제거 -> {1, 2, 3}
-
-print("Set:", my_set)
-print("Dict Name:", my_dict["name"])`
-      },
-      {
-        title: '🚀 심화 깊이보기: 메모리 참조(Reference) & 얕은/깊은 복사',
-        content: `파이썬에서 변수는 메모리상의 객체를 가리키는 **포인터(참조)**입니다.
-
-1. **작은 정수 캐싱 (Small Integer Caching):**
-   - \`a = 100\`, \`b = 100\` 실행 시 파이썬은 -5~256 정수를 미리 생성해두므로 \`id(a) == id(b)\`가 \`True\`입니다.
-2. **복사 비교:**
-   - 대입(\`b = a\`): 같은 메모리를 공유합니다.
-   - 얕은 복사(\`copy.copy()\`, \`a[:]\`): 최상위 객체만 복사, 내부 중첩 리스트는 공유.
-   - 깊은 복사(\`copy.deepcopy()\`): 모든 중첩 데이터까지 완전 독립 복사.`,
-        code: `import copy
-
-original = [[1, 2], [3, 4]]
-shallow = copy.copy(original)
-deep = copy.deepcopy(original)
-
-original[0][0] = 999
-print("Shallow Copy:", shallow) # [[999, 2], [3, 4]] (내부 공유됨)
-print("Deep Copy   :", deep)    # [[1, 2], [3, 4]] (독립 유지)`
-      }
-    ],
-    quizzes: [
-      { id: 1, type: 'mc', question: '파이썬의 기본 자료형 중 "불가변(Immutable)" 객체에 해당하는 것은?', options: ['List', 'Dict', 'Set', 'Tuple'], answer: 3, exp: 'Tuple과 String, Int, Float 등은 Immutable(불가변) 객체입니다.' },
-      { id: 2, type: 'tf', question: '파이썬에서 bool 타입은 int 타입의 서브클래스이므로 True + True 의 결과는 2이다.', answer: true, exp: 'True는 1, False는 0의 정수값을 가지므로 True + True = 2입니다.' },
-      { id: 3, type: 'code', question: '다음 코드의 출력값은?\nprint(type(3.14) == float)', options: ['True', 'False', '<class "float">', 'Error'], answer: 0, exp: 'type(3.14)는 float 클래스를 반환하며, float과 같으므로 True입니다.' },
-      { id: 4, type: 'mc', question: '변수의 메모리 고유 주소(ID)를 반환하는 내장 함수는?', options: ['address()', 'id()', 'mem()', 'pointer()'], answer: 1, exp: 'id() 함수는 객체의 고유 메모리 식별자를 반환합니다.' },
-      { id: 5, type: 'mc', question: '다음 중 중복 요소를 허용하지 않고 순서가 없는 자료구조는?', options: ['List', 'Tuple', 'Dictionary', 'Set'], answer: 3, exp: 'Set(집합)은 중복을 허용하지 않으며 요소에 순서가 없습니다.' },
-      { id: 6, type: 'code', question: 'x = [1, 2, 3]\ny = x\ny.append(4)\nprint(len(x)) 의 결과는?', options: ['3', '4', 'Error', 'None'], answer: 1, exp: '리스트는 Mutable 객체이므로 y와 x가 같은 메모리를 참조합니다. 따라서 len(x)는 4가 됩니다.' },
-      { id: 7, type: 'tf', question: '파이썬 Dictionary의 Key값으로는 리스트(List)를 사용할 수 있다.', answer: false, exp: 'Dict의 Key는 Hashable(Immutable)해야 하므로 가변 객체인 List는 Key로 사용 불가합니다.' },
-      { id: 8, type: 'mc', question: '다음 중 실수(float) 3.0을 정수(int)로 올바르게 변환하는 것은?', options: ['int("3.0")', 'int(3.0)', 'to_int(3.0)', 'parse_int(3.0)'], answer: 1, exp: 'int(3.0)은 3을 반환합니다. 단, int("3.0") 문자열 변환은 ValueError를 발생시킵니다.' },
-      { id: 9, type: 'code', question: 's = "Python"\nprint(s[1:4]) 의 출력값은?', options: ['Pyt', 'yth', 'ytho', 'Pyt'], answer: 1, exp: '인덱스 1부터 4 전까지(1, 2, 3) 잘라내므로 "yth"입니다.' },
-      { id: 10, type: 'tf', question: 'iter() 함수로 객체를 Iterator로 변환하면 next() 함수를 사용하여 다음 값을 호출할 수 있다.', answer: true, exp: 'Iterable 객체는 iter()를 통해 Iterator로 변환되며 next() 호출이 가능해집니다.' },
-      { id: 11, type: 'mc', question: '복소수 `z = 3 + 5j`에서 허수부를 추출하는 속성은?', options: ['z.real', 'z.imag', 'z.complex', 'z.virtual'], answer: 1, exp: 'z.imag 속성이 허수부(5.0)를 반환합니다.' },
-      { id: 12, type: 'code', question: 'a = (1,)\nprint(type(a)) 의 결과는?', options: ['<class "int">', '<class "tuple">', '<class "list">', 'Error'], answer: 1, exp: '원소가 1개인 튜플은 (1,) 형태로 콤마를 붙여야 tuple 타입이 됩니다.' },
-      { id: 13, type: 'tf', question: '파이썬 3에서는 -5부터 256까지의 정수 객체를 미리 메모리에 생성해두고 재사용(Caching)한다.', answer: true, exp: '작은 정수 객체(-5 ~ 256)는 인터프리터 시동 시 캐싱되어 동일한 메모리 주소를 가집니다.' },
-      { id: 14, type: 'mc', question: '다음 중 비어있는 Set(집합)을 생성하는 바른 방법은?', options: ['s = {}', 's = set()', 's = Set()', 's = []'], answer: 1, exp: '{}는 빈 Dictionary를 만듭니다. 빈 집합은 set()으로 생성합니다.' },
-      { id: 15, type: 'code', question: 'a = [1, 2]\nb = [1, 2]\nprint(a is b) 의 결과는?', options: ['True', 'False', 'Error', 'None'], answer: 1, exp: 'a와 b는 값은 같지만(== True) 별도의 메모리에 할당된 서로 다른 리스트 객체이므로 `is` 연산자는 False입니다.' },
-      { id: 16, type: 'mc', question: '다음 중 문자열 메서드 중 모든 문자를 대문자로 변환하는 것은?', options: ['toUpper()', 'upper()', 'capitalize()', 'uppercase()'], answer: 1, exp: 'str.upper() 메서드가 전 문자열을 대문자로 변환합니다.' },
-      { id: 17, type: 'tf', question: '파이썬의 문자열(str)은 인덱스를 통한 요소 변경(예: s[0] = "A")이 가능하다.', answer: false, exp: '문자열은 Immutable 하므로 인덱싱을 통한 요소 수정이 불가능합니다.' },
-      { id: 18, type: 'code', question: 'd = {"a": 1, "b": 2}\nprint(d.get("c", 0)) 의 출력값은?', options: ['None', 'KeyError', '0', 'False'], answer: 2, exp: 'get(key, default) 메서드는 키가 존재하지 않을 때 지정한 기본값(0)을 반환합니다.' },
-      { id: 19, type: 'mc', question: '다음 중 16진수 표현 접두사로 올바른 것은?', options: ['0b', '0o', '0x', '0h'], answer: 2, exp: '0x는 16진수(Hexadecimal), 0b는 2진수, 0o는 8진수 접두사입니다.' },
-      { id: 20, type: 'code', question: 'lst = [1, 2, 3, 4, 5]\nprint(lst[::-1]) 의 출력 결과는?', options: ['[1, 2, 3, 4, 5]', '[5, 4, 3, 2, 1]', '[5]', 'Error'], answer: 1, exp: '슬라이싱 [::-1]은 리스트를 역순으로 뒤집어 반환합니다.' }
-    ]
-  },
-  {
-    id: 'io',
-    title: '2. 입력과 출력',
-    sub: 'Input & Output Operations',
-    icon: Terminal,
-    color: 'from-purple-500 to-indigo-600',
-    accentColor: 'purple',
-    concepts: [
-      {
-        title: '🌱 쉬운 개념: 표준 입력(input)과 출력(print)',
-        content: `• **표준 입력 (\`input()\`)**: 키보드로부터 사용자의 입력을 받는 함수입니다.
-  - 입력받은 데이터는 기본적으로 **문자열(\`str\`)** 형태입니다.
-  - 계산에 활용하려면 \`int()\`, \`float()\` 등으로 **형 변환(Casting)**을 해 주어야 합니다.
-  - 한 번에 여러 값 받기: \`a, b = map(int, input().split())\`
-
-• **표준 출력 (\`print()\`)**: 모니터 화면에 결과를 출력하는 함수입니다.
-  - \`sep\`: 여러 항목을 출력할 때 사이를 채울 구분자 지정 (기본값: 공백 \`' '\`)
-  - \`end\`: 출력이 끝난 후 마지막에 붙일 문자 지정 (기본값: 줄바꿈 \`'\\n'\`)
-
-• **이스케이프 문자**: 백슬래시(\`\\\`)와 조합하여 사용하는 특수 문자
-  - \`\\n\`: 줄바꿈 | \`\\t\`: 탭 간격 띄우기 | \`\\\\\`: 백슬래시 자체 | \`\\'\`, \`\\"\`: 따옴표 자체`,
-        code: `# 표준 입출력 및 형변환 예시
-age_str = "20"
-age_num = int(age_str) + 1  # 정수로 변환 후 연산
-
-print("결과:", age_num, sep=" => ", end="세\\n")
-print("줄바꿈\\n탭간격\\t확인")`
-      },
-      {
-        title: '🚀 심화 깊이보기: f-string 포매팅 & 입출력 속도 최적화',
-        content: `■ **파이썬 3대 문자열 포매팅:**
-1. **% 포매팅:** \`"%s는 %d살"\`
-2. **format() 메서드:** \`"{}는 {}살".format("철수", 17)\`
-3. **f-string (추천):** \`f"{name}는 {age}살"\` (속도 최고, 표현식 삽입 가능)
-
-■ **f-string 주요 서식 규칙:**
-- 소수점 자리수: \`f"{val:.2f}"\` (소수점 둘째 자리)
-- 0으로 채우기: \`f"{val:05d}"\` (5자리 중 빈 곳을 0으로 채움)
-- 속도 최적화: 백준 등 알고리즘 입출력 시 \`sys.stdin.readline().rstrip()\`을 사용하면 \`input()\` 대비 10배 이상 빠릅니다.`,
-        code: `import sys
-
-val = 123.4567
-print(f"소수점 2자리: {val:.2f}")    # 123.46
-print(f"0 채우기: {7:05d}")          # 00007
-
-# 알고리즘 빠른 입력 문법
-# input_data = sys.stdin.readline().rstrip()`
-      }
-    ],
-    quizzes: [
-      { id: 1, type: 'mc', question: 'input() 함수가 기본적으로 반환하는 데이터의 타입은?', options: ['int', 'float', 'str', 'bool'], answer: 2, exp: 'input() 함수는 사용자가 입력한 내용을 항상 문자열(str)로 받아옵니다.' },
-      { id: 2, type: 'code', question: 'print("A", "B", "C", sep="-") 의 출력 결과는?', options: ['A B C', 'A-B-C', 'A-B-C-', 'ABC'], answer: 1, exp: 'sep="-" 인자에 의해 각 출력 요소 사이에 "-"가 삽입됩니다.' },
-      { id: 3, type: 'tf', question: 'print() 함수는 호출 시 기본적으로 맨 끝에 줄바꿈(\\n)을 수행한다.', answer: true, exp: 'print()의 end 매개변수의 기본값이 "\\n"이므로 줄바꿈이 일어납니다.' },
-      { id: 4, type: 'code', question: 'a, b = map(int, ["10", "20"])\nprint(a + b) 의 출력 결과는?', options: ['1020', '30', 'Error', '["1020"]'], answer: 1, exp: 'map(int, ...)을 통해 두 문자열이 정수 10과 20으로 변환되어 더해지므로 30입니다.' },
-      { id: 5, type: 'mc', question: '문자열 내에서 탭(Tab) 간격을 출력하기 위한 이스케이프 문자는?', options: ['\\n', '\\t', '\\r', '\\b'], answer: 1, exp: '\\t는 탭(Tab) 간격 출력을 나타냅니다.' },
-      { id: 6, type: 'code', question: 'print("Hello", end="")\nprint("World") 의 출력 결과는?', options: ['Hello World', 'Hello\\nWorld', 'HelloWorld', 'Error'], answer: 2, exp: 'end=""로 줄바꿈을 제거했으므로 두 문자열이 바로 이어져 HelloWorld가 됩니다.' },
-      { id: 7, type: 'tf', question: '`input("나이: ")` 실행 시 사용자가 25를 입력하면 변수 타입은 int가 된다.', answer: false, exp: '사용자가 숫자를 입력하더라도 input()은 문자열 "25"를 반환합니다.' },
-      { id: 8, type: 'mc', question: 'f-string 서식 지정에서 실수 x를 소수점 둘째 자리까지 표시하는 표현은?', options: ['f"{x:2f}"', 'f"{x:.2f}"', 'f"{x%2f}"', 'f"{x;.2f}"'], answer: 1, exp: '소수점 n자리 표시는 `{변수:.nf}` 형태로 사용합니다.' },
-      { id: 9, type: 'code', question: 'print(\'It\\\'s Py\\nthon\') 의 줄 수는 총 몇 줄로 출력되는가?', options: ['1줄', '2줄', '3줄', '구문 오류'], answer: 1, exp: '\\n 이스케이프 문자가 들어가 있으므로 총 2줄로 나누어 출력됩니다.' },
-      { id: 10, type: 'tf', question: '파이썬의 sys.stdin.readline()은 input()보다 대량의 데이터 입력 시 속도가 빠르다.', answer: true, exp: 'sys.stdin.readline()은 버퍼를 통해 직접 읽어오므로 input()보다 속도가 훨씬 빠릅니다.' },
-      { id: 11, type: 'mc', question: '큰따옴표 안에 큰따옴표를 출력하기 위해 사용하는 방법으로 옳은 것은?', options: ['\\"', '""', '/"', '%"'], answer: 0, exp: '이스케이프 문자 \\" 를 사용하면 큰따옴표 안에 큰따옴표를 포함할 수 있습니다.' },
-      { id: 12, type: 'code', question: 'x = 10\nprint(f"{x * 2}") 의 출력 결과는?', options: ['x * 2', '20', '102', 'Error'], answer: 1, exp: 'f-string 내부 중괄호 {} 안에는 파이썬 수식 표현식이 평가되어 실행됩니다.' },
-      { id: 13, type: 'tf', question: 'print() 함수에서 file 매개변수를 지정하면 출력을 콘솔이 아닌 파일로 보낼 수 있다.', answer: true, exp: 'print("내용", file=open_file) 형태로 파일 출력이 가능합니다.' },
-      { id: 14, type: 'mc', question: '다음 중 문자열 포매팅 방식을 모두 고른 것은? (a) % 포매팅, (b) format() 메서드, (c) f-string', options: ['(c)만', '(b), (c)', '(a), (b), (c)', '(a)만'], answer: 2, exp: '세 가지 모두 파이썬에서 공식 지원하는 문자열 포매팅 기법입니다.' },
-      { id: 15, type: 'code', question: 'print("123".zfill(5)) 의 출력 결과는?', options: ['12300', '00123', '  123', '123  '], answer: 1, exp: 'zfill(width)는 지정한 길이가 되도록 앞에 0을 채웁니다.' },
-      { id: 16, type: 'tf', question: 'raw string(예: r"C:\\new\\test")을 사용하면 이스케이프 문자가 그대로 일반 문자로 처리된다.', answer: true, exp: '문자열 앞에 r을 붙이면 이스케이프 문자 해석을 비활성화합니다.' },
-      { id: 17, type: 'mc', question: '여러 개의 변수를 입력받아 분할할 때 사용되는 문자열 메서드는?', options: ['join()', 'split()', 'divide()', 'slice()'], answer: 1, exp: 'split() 메서드가 구분자를 기준으로 문자열을 분할하여 리스트로 만듭니다.' },
-      { id: 18, type: 'code', question: 'print(1, 2, 3, sep="") 의 출력 결과는?', options: ['1 2 3', '1, 2, 3', '123', 'Error'], answer: 2, exp: 'sep이 빈 문자열 ""로 지정되었으므로 공백 없이 붙어서 123이 출력됩니다.' },
-      { id: 19, type: 'tf', question: 'input().split(",") 은 쉼표를 기준으로 입력 문자열을 분할한다.', answer: true, exp: 'split()의 인자로 구분 기호를 지정할 수 있으며 기본값은 공백입니다.' },
-      { id: 20, type: 'code', question: 'val = input() 또는 "기본값"\n# 만약 입력이 빈 문자열일 때 val의 평가 결과는?', options: ['빈 문자열 ""', '"기본값"', 'None', 'Error'], answer: 1, exp: '빈 문자열은 단시(Falsy) 처리되므로 논리연산자 or에 의해 "기본값"이 선택됩니다.' }
-    ]
-  },
-  {
-    id: 'operators',
-    title: '3. 연산자',
-    sub: 'Operators & Precedence',
-    icon: Sliders,
-    color: 'from-emerald-500 to-teal-600',
-    accentColor: 'emerald',
-    concepts: [
-      {
-        title: '🌱 쉬운 개념: 연산자 4대 종류 총정리',
-        content: `• **산술 연산자**:
-  - \`+\` (더하기), \`-\` (빼기), \`*\` (곱하기), \`/\` (나누기 - 결과는 항상 float 실수)
-  - \`%\` (나머지), \`//\` (몫), \`**\` (제곱)
-
-• **비교(관계) 연산자**: (결과는 \`True\` 또는 \`False\`)
-  - \`==\` (같다), \`!=\` (다르다)
-  - \`<\`, \`>\`, \`<=\` (작거나 같다), \`>=\` (크거나 같다)
-
-• **논리 연산자**:
-  - \`and\`: 둘 다 \`True\`일 때만 \`True\`
-  - \`or\`: 둘 중 하나라도 \`True\`이면 \`True\`
-  - \`not\`: 참과 거짓을 반대로 바꿈 (\`True\` -> \`False\`)
-
-• **비트 연산자**: 2진수 비트 단위 연산 (\`&\`, \`|\`, \`^\`, \`~\`, \`<<\`, \`>>\`)`,
-        code: `print("나누기:", 7 / 2)   # 3.5 (float)
-print("몫    :", 7 // 2)  # 3 (int)
-print("나머지:", 7 % 2)   # 1
-
-print(10 > 5 and 3 < 1)  # False (True and False)`
-      },
-      {
-        title: '🚀 심화 깊이보기: 단락 평가 (Short-Circuit) & 연산자 우선순위',
-        content: `■ **단락 평가 (Short-Circuit Evaluation):**
-- **\`A and B\`**: A가 Falsy이면 **B를 평가하지 않고 A를 즉시 반환**.
-- **\`A or B\`**: A가 Truthy이면 **B를 평가하지 않고 A를 즉시 반환**.
-- 0으로 나누기 예외(\`ZeroDivisionError\`)를 사전 방지할 때 유용합니다.
-
-■ **연산자 우선순위 요약:**
-1. \`()\`: 괄호  
-2. \`**\`: 거듭제곱  
-3. \`*\`, \`/\`, \`//\`, \`%\`: 곱셈/나눗셈 계열  
-4. \`+\`, \`-\`: 덧셈/뺄셈  
-5. \`==\`, \`!=\`, \`<\`, \`>\`, \`is\`, \`in\`: 비교 연산자  
-6. \`not\` -> \`and\` -> \`or\`: 논리 연산자`,
-        code: `# 단락 평가로 ZeroDivisionError 방지
-x = 0
-if x != 0 and (10 / x > 1):
-    print("성공")
-else:
-    print("x가 0이라 안전하게 스킵됨")`
-      }
-    ],
-    quizzes: [
-      { id: 1, type: 'code', question: 'print(7 // 2) 의 출력 결과는?', options: ['3.5', '3', '4', '2'], answer: 1, exp: '// 연산자는 나눗셈의 몫(정수 부분)만을 반환하므로 3입니다.' },
-      { id: 2, type: 'code', question: 'print(2 ** 3 ** 2) 의 출력 결과는? (우선순위 주의!)', options: ['64', '512', '36', '81'], answer: 1, exp: '거듭제곱 연산자(**)는 우측 결합 법칙을 따르므로 2 ** (3 ** 2) = 2 ** 9 = 512 입니다.' },
-      { id: 3, type: 'mc', question: '다음 중 나눗셈을 수행했을 때 결과 타입이 항상 float이 되는 연산자는?', options: ['//', '%', '/', 'div'], answer: 2, exp: '/ 연산자는 피연산자가 모두 정수라도 결과로 항상 float을 반환합니다.' },
-      { id: 4, type: 'code', question: 'print(5 == 5.0) 의 출력 결과는?', options: ['True', 'False', 'Error', 'None'], answer: 0, exp: '== 연산자는 값을 비교하므로 정수 5와 실수 5.0은 동등(True)합니다.' },
-      { id: 5, type: 'tf', question: '`a is b` 연산자는 두 변수의 값이 같은지(Value Equality)를 비교한다.', answer: false, exp: '`is` 연산자는 값이 아닌 두 변수가 가리키는 메모리 주소(Identity)를 비교합니다.' },
-      { id: 6, type: 'code', question: 'print(3 and 5) 의 출력 결과는?', options: ['True', 'False', '3', '5'], answer: 3, exp: '논리 and 연산자는 앞의 값이 참이면 뒤의 값(5)을 평가하여 반환합니다.' },
-      { id: 7, type: 'code', question: 'print(0 or "Python") 의 출력 결과는?', options: ['0', '"Python"', 'True', 'False'], answer: 1, exp: '0은 거짓(Falsy)이므로 or 연산자는 다음 값인 "Python"을 반환합니다.' },
-      { id: 8, type: 'mc', question: '비트 연산자 중 두 비트가 서로 다를 때만 1을 반환하는 XOR 연산 기호는?', options: ['&', '|', '^', '~'], answer: 2, exp: '^ (Caret) 연산자가 비트 XOR (Exclusive OR) 연산자입니다.' },
-      { id: 9, type: 'code', question: 'x = 5\nx += 3 * 2\nprint(x) 의 출력 결과는?', options: ['16', '11', '10', 'Error'], answer: 1, exp: '복합 대입 연산자는 우변이 먼저 평가됩니다 (3 * 2 = 6). 따라서 5 + 6 = 11입니다.' },
-      { id: 10, type: 'tf', question: '파이썬에서는 `1 < x < 10`과 같은 연속 비교 연산식 표현이 가능하다.', answer: true, exp: '파이썬은 `1 < x and x < 10` 과 같은 연쇄 비교(Chained Comparison)를 지원합니다.' },
-      { id: 11, type: 'code', question: 'print(not []) 의 출력 결과는?', options: ['True', 'False', '[]', 'Error'], answer: 0, exp: '빈 리스트 []는 Falsy(거짓)이므로 not [] 은 True가 됩니다.' },
-      { id: 12, type: 'mc', question: '다음 중 비트 좌측 이동 연산자로 2를 곱하는 효과를 주는 연산자는?', options: ['>>', '<<', '**', '//'], answer: 1, exp: '<< (Left shift) 연산자는 비트를 좌측으로 이동시키며 1비트당 2배 곱셈 효과를 줍니다.' },
-      { id: 13, type: 'code', question: 'print(10 % 3) 의 출력 결과는?', options: ['3', '1', '3.33', '0'], answer: 1, exp: '% 연산자는 나눗셈 후 나머지 값을 구하므로 10을 3으로 나눈 나머지 1입니다.' },
-      { id: 14, type: 'tf', question: '단락 평가(Short-circuit)에 의해 `False and (1/0)` 코드는 에러가 발생하지 않는다.', answer: true, exp: 'and 연산에서 첫 번째 조건이 False이므로 뒤의 1/0 식을 평가하지 않고 바로 False를 넘깁니다.' },
-      { id: 15, type: 'code', question: 'print(~0) 의 비트 반전 출력 결과는?', options: ['0', '1', '-1', '-2'], answer: 2, exp: '비트 NOT(~) 연산은 -(x + 1)을 수행하므로 ~0 은 -1이 됩니다.' },
-      { id: 16, type: 'mc', question: '다음 중 멤버십 연산자로 특정 요소가 시퀀스 안에 존재하는지 확인하는 연산자는?', options: ['has', 'in', 'exist', 'contains'], answer: 1, exp: '`in` 연산자 (예: `val in list`)가 멤버십 포함 여부를 판단합니다.' },
-      { id: 17, type: 'code', question: 'print("a" in "cat") 의 결과는?', options: ['True', 'False', 'Error', '1'], answer: 0, exp: '문자열 "cat"에 문자의 일부인 "a"가 포함되어 있으므로 True입니다.' },
-      { id: 18, type: 'tf', question: '산술 연산자 중 곱셈(*)과 나눗셈(/)은 덧셈(+)과 뺄셈(-)보다 우선순위가 높다.', answer: true, exp: '수학과 마찬가지로 곱셈과 나눗셈 연산이 덧셈/뺄셈보다 우선하여 실행됩니다.' },
-      { id: 19, type: 'code', question: 'print(4 & 5) 의 비트 AND 연산 결과는?', options: ['4', '5', '9', '1'], answer: 0, exp: '4(100_2) & 5(101_2) = 100_2 이므로 십진수 4가 됩니다.' },
-      { id: 20, type: 'mc', question: '다음 중 삼항 연산자 (조건 연산자) 표현으로 올바른 것은?', options: ['x > 0 ? "양수" : "음수"', '"양수" if x > 0 else "음수"', 'if x > 0 then "양수" else "음수"', 'x > 0 -> "양수" : "음수"'], answer: 1, exp: '파이썬의 conditional expression 구문은 `[참일 때 값] if [조건] else [거짓일 때 값]` 입니다.' }
-    ]
-  },
-  {
-    id: 'control',
-    title: '4. 제어문',
-    sub: 'Control Flow (if, for, while)',
-    icon: Layers,
-    color: 'from-amber-500 to-orange-600',
-    accentColor: 'amber',
-    concepts: [
-      {
-        title: '🌱 쉬운 개념: 조건문(if)과 반복문(for, while)',
-        content: `프로그램의 실행 흐름을 조절하는 구문입니다. (※ 코드 블록 작성을 위해 반드시 **들여쓰기(Indentation)** 규칙을 지켜야 합니다.)
-
-■ **① 조건문 (Selection):**
-- **단일 선택 (\`if\`)**: 조건이 참일 때만 실행
-- **이중 선택 (\`if - else\`)**: 조건이 참일 때와 거짓일 때 각각 다른 코드 실행
-- **다중 선택 (\`if - elif - else\`)**: 3개 이상의 조건 중 하나를 선택하여 실행
-
-■ **② 반복문 (Iteration):**
-- **\`for\` 문**: 지정된 횟수나 시퀀스의 원소를 순차적으로 순회 (\`range(시작, 끝, 증감폭)\`과 조합)
-- **\`while\` 문**: 조건식이 참(\`True\`)인 동안 계속해서 반복 실행
-
-■ **반복 흐름 제어:**
-- \`break\`: 반복문을 즉시 완전히 탈출합니다.
-- \`continue\`: 아래 코드를 실행하지 않고 다음 반복 회차로 건너뜁니다.`,
-        code: `# 조건문과 반복문 쉬운 예시
-score = 85
-if score >= 90:
-    print("A등급")
-elif score >= 80:
-    print("B등급")
-else:
-    print("C등급")
-
-# for문과 range
-for i in range(1, 4):
-    print(f"{i}번째 반복")`
-      },
-      {
-        title: '🚀 심화 깊이보기: Loop else 구문 & 삼항 연산자',
-        content: `■ **루프 else 구문 (Loop-else Clause):**
-- \`for\`나 \`while\` 루프 끝에 \`else:\` 블록을 작성할 수 있습니다.
-- **특징:** 루프 내에서 **\`break\`를 만나지 않고 정상적으로 루프가 끝났을 때만** \`else\` 블록이 실행됩니다!
-
-■ **삼항 연산자 (Conditional Expression):**
-- 한 줄로 작성하는 조건문: \`참일때_값 if 조건식 else 거짓일때_값\``,
-        code: `# Loop-else 소수 판별 예시
-num = 7
-for i in range(2, num):
-    if num % i == 0:
-        print("소수가 아닙니다.")
-        break
-else:
-    print(f"{num}은 소수(Prime)입니다!") # break 안 만났으므로 실행됨`
-      }
-    ],
-    quizzes: [
-      { id: 1, type: 'code', question: 'sum_val = 0\nfor i in range(1, 4):\n    sum_val += i\nprint(sum_val) 의 출력 결과는?', options: ['6', '10', '3', '4'], answer: 0, exp: 'range(1, 4)는 1, 2, 3을 생성하므로 sum_val = 1 + 2 + 3 = 6입니다.' },
-      { id: 2, type: 'mc', question: '반복문 전체를 즉시 중단하고 루프 블록을 빠져나오게 만드는 키워드는?', options: ['stop', 'continue', 'exit', 'break'], answer: 3, exp: 'break 키워드는 반복문을 완전히 종료하고 탈출합니다.' },
-      { id: 3, type: 'code', question: 'count = 0\nwhile count < 3:\n    count += 1\nprint(count) 의 출력 결과는?', options: ['2', '3', '4', '무한루프'], answer: 1, exp: 'count가 0, 1, 2일 때 루프가 실행되고 3이 되는 순간 while 조건이 거짓이 되어 3이 출력됩니다.' },
-      { id: 4, type: 'tf', question: 'for 루프에서 break 문이 실행되어 종료되면 루프에 딸린 else 블록도 실행된다.', answer: false, exp: '루프의 else 블록은 break 문을 만나지 않고 루프가 정상 종료되었을 때만 실행됩니다.' },
-      { id: 5, type: 'code', question: 'for i in range(5):\n    if i == 2: continue\n    print(i, end="") 의 출력 결과는?', options: ['01234', '0134', '01', '2'], answer: 1, exp: 'i가 2일 때 continue로 인해 print를 스킵하므로 0134가 출력됩니다.' },
-      { id: 6, type: 'mc', question: '다음 중 range(5)가 생성하는 숫자의 시퀀스로 올바른 것은?', options: ['1, 2, 3, 4, 5', '0, 1, 2, 3, 4', '0, 1, 2, 3, 4, 5', '1, 2, 3, 4'], answer: 1, exp: 'range(stop)은 0부터 시작하여 stop - 1 인 4까지 생성합니다.' },
-      { id: 7, type: 'code', question: 'x = 10\nif x > 5:\n    print("A")\nelif x > 8:\n    print("B")\nelse:\n    print("C") 의 출력값은?', options: ['A', 'B', 'A와 B', 'C'], answer: 0, exp: '첫 번째 조건 x > 5가 참이므로 "A"만 출력되고 아래 elif는 평가되지 않습니다.' },
-      { id: 8, type: 'tf', question: 'pass 키워드는 문법적으로 문장이 필요하지만 아무 동작도 하고 싶지 않을 때 사용한다.', answer: true, exp: 'pass는 널 연산(Null operation)으로 아무 작업도 수행하지 않는 껍데기 구문입니다.' },
-      { id: 9, type: 'code', question: 'nums = [10, 20]\nfor idx, val in enumerate(nums):\n    print(idx, val, end=" ")\n의 출력 결과는?', options: ['10 0 20 1', '0 10 1 20', '10 20', '0 1 10 20'], answer: 1, exp: 'enumerate는 (인덱스, 값) 순으로 튜플을 반환하므로 0 10 1 20 입니다.' },
-      { id: 10, type: 'mc', question: '두 개의 리스트를 병렬로 묶어서 동일 인덱스끼리 순회하게 해주는 내장 함수는?', options: ['bind()', 'concat()', 'zip()', 'combine()'], answer: 2, exp: 'zip() 함수는 여러 iterable 객체의 대응 요소들을 묶는 iterator를 제공합니다.' },
-      { id: 11, type: 'code', question: 'x = 0\nif x:\n    print("True")\nelse:\n    print("False") 의 출력값은?', options: ['True', 'False', 'Error', '0'], answer: 1, exp: '숫자 0은 거짓(False)으로 평가되어 else 블록이 실행됩니다.' },
-      { id: 12, type: 'tf', question: 'while True: 구문은 조건식이 항상 참이므로 무한 루프를 생성한다.', answer: true, exp: '조건이 항상 True이므로 내부에서 break 등으로 탈출하지 않는 한 무한 루프가 됩니다.' },
-      { id: 13, type: 'code', question: 'for i in range(10, 0, -2):\n    print(i, end=" ")\n의 출력 결과는?', options: ['10 8 6 4 2', '10 8 6 4 2 0', '10 9 8 7 6', 'Error'], answer: 0, exp: 'range(10, 0, -2)는 10부터 0 전(2)까지 -2씩 감소하는 10 8 6 4 2를 생성합니다.' },
-      { id: 14, type: 'mc', question: '다음 중 조건문 조건식 작성 시 틀린 문법은?', options: ['if x == 5:', 'if (x == 5)', 'if x == 5 then', 'if not x:'], answer: 2, exp: '파이썬 조건문에는 `then` 키워드를 사용하지 않으며 콜론(:)으로 종료합니다.' },
-      { id: 15, type: 'code', question: 'res = [i * 2 for i in range(3)]\nprint(res) 의 출력 결과는?', options: ['[0, 2, 4]', '[2, 4, 6]', '[0, 1, 2]', '[1, 2, 3]'], answer: 0, exp: '리스트 컴프리헨션에 의해 0*2, 1*2, 2*2 결과인 [0, 2, 4] 리스트가 생성됩니다.' },
-      { id: 16, type: 'tf', question: '파이썬에서는 블록을 구분할 때 중괄호 { } 대신 들여쓰기(Indentation)를 사용한다.', answer: true, exp: '파이썬은 들여쓰기를 문법적 블록 구조 구분을 위해 강제하는 언어입니다.' },
-      { id: 17, type: 'code', question: 'a = [1, 2, 3]\nwhile a:\n    a.pop()\nprint(len(a)) 의 출력값은?', options: ['3', '1', '0', 'Error'], answer: 2, exp: 'a의 원소가 모두 pop()되어 빈 리스트가 되면 while 조건(Falsy)이 끝나므로 len(a)는 0입니다.' },
-      { id: 18, type: 'mc', question: '다음 중 조건부 리스트 컴프리헨션 구문 형식으로 올바른 것은?', options: ['[x for x in list if x > 0]', '[if x > 0 for x in list]', '[x if x > 0 for list]', '[for x in list x if > 0]'], answer: 0, exp: '기본 리스트 컴프리헨션 필터링 조건문은 맨 뒤에 `if 조건` 형태로 붙습니다.' },
-      { id: 19, type: 'code', question: 'for i in range(1, 1):\n    print("Hi")\n의 출력 횟수는?', options: ['0회', '1회', '무한', 'Error'], answer: 0, exp: 'range(1, 1)은 빈 범위(시작 >= 종료)를 가지므로 루프가 한 번도 실행되지 않습니다.' },
-      { id: 20, type: 'tf', question: '3.10 버전부터 파이썬에 match-case (패턴 매칭) 구문이 도입되었다.', answer: true, exp: '파이썬 3.10부터 C/Java의 switch-case와 유사한 match-case 패턴 매칭이 추가되었습니다.' }
-    ]
-  },
-  {
-    id: 'functions',
-    title: '5. 함수 및 라이브러리',
-    sub: 'Functions, Scope & Libraries',
-    icon: Code,
-    color: 'from-pink-500 to-rose-600',
-    accentColor: 'rose',
-    concepts: [
-      {
-        title: '🌱 쉬운 개념: 함수의 기본 요소 및 스코프(Scope)',
-        content: `일정한 동작을 수행하도록 묶어 둔 코드의 집합입니다. 코드의 **재사용성**과 **가독성**을 높여 줍니다.
-
-• **용어 정리**:
-  - **매개변수 (Parameter)**: 함수를 정의할 때 전달받은 값을 저장하기 위해 선언하는 변수
-  - **인수 (Argument)**: 함수를 호출할 때 실제로 전달하는 값
-  - **\`return\`**: 함수의 결과를 호출한 위치로 반환하고 함수를 종료시킵니다.
-
-• **변수의 범위 (Scope)**:
-  - **지역 변수 (Local Variable)**: 함수 내부에서 생성되어 함수 안에서만 사용되고 소멸하는 변수
-  - **전역 변수 (Global Variable)**: 프로그램 전체에서 접근할 수 있는 변수. (함수 내부에서 전역 변수 수정 시 \`global\` 키워드 사용)
-
-• **람다 함수 (\`lambda\`)**: 한 줄로 간결하게 작성하는 익명 함수 (\`lambda a, b: a + b\`)`,
-        code: `# 사용자 정의 함수 기본 문법
-def add(a, b):  # a, b는 매개변수
-    return a + b
-
-result = add(10, 20)  # 10, 20은 인수
-print("합계:", result)
-
-# 람다 함수
-mul = lambda x, y: x * y
-print("곱셈:", mul(3, 4))`
-      },
-      {
-        title: '🚀 심화 깊이보기: LEGB Rule & 주요 데이터 라이브러리',
-        content: `■ **변수 탐색 순서 (LEGB Rule):**
-1. **L (Local)**: 함수 내부
-2. **E (Enclosing)**: 상위 외부 중첩 함수 (\`nonlocal\` 키워드로 수정 가능)
-3. **G (Global)**: 파일 최고 레벨 전역 (\`global\` 키워드로 수정 가능)
-4. **B (Built-in)**: 파이썬 내장 영역 (\`len\`, \`print\` 등)
-
-■ **파이썬 데이터 과학 3대 핵심 라이브러리:**
-- **NumPy**: C언어 기반의 고성능 다차원 배열(\`ndarray\`) 연산 지원.
-- **Pandas**: 2차원 표 형태 데이터 구조인 **DataFrame** 및 **Series** 전처리/분석.
-- **Matplotlib**: 2D 꺾은선 그래프, 산점도 등 데이터 시각화 표준 라이브러리.`,
-        code: `# LEGB Scope 실습
-count = 100 # Global
-
-def outer():
-    count = 10 # Enclosing
-    def inner():
-        nonlocal count
-        count += 5
-        print("Inner count:", count) # 15
-    inner()
-    print("Outer count:", count) # 15
-
-outer()`
-      }
-    ],
-    quizzes: [
-      { id: 1, type: 'mc', question: '파이썬에서 함수를 정의할 때 사용하는 키워드는?', options: ['function', 'def', 'func', 'define'], answer: 1, exp: '파이썬 함수는 `def` 키워드로 시작하여 정의합니다.' },
-      { id: 2, type: 'code', question: 'def add(a, b=5):\n    return a + b\nprint(add(3)) 의 출력값은?', options: ['3', '5', '8', 'Error'], answer: 2, exp: 'b의 기본값이 5로 지정되어 있으므로 add(3)은 3 + 5 = 8 이 됩니다.' },
-      { id: 3, type: 'mc', question: '임의 개수의 위치 인자를 튜플 형태로 함수 내부로 전달받는 매개변수 표기법은?', options: ['**kwargs', '*args', '&args', '$args'], answer: 1, exp: '*args 표기법은 가변 위치 인자를 튜플 형태로 수집합니다.' },
-      { id: 4, type: 'code', question: 'f = lambda x, y: x * y\nprint(f(3, 4)) 의 출력 결과는?', options: ['7', '12', '34', 'Error'], answer: 1, exp: '람다 함수 식에 의해 3 * 4 = 12 가 반환됩니다.' },
-      { id: 5, type: 'tf', question: '함수 내에서 return 문을 명시하지 않으면 함수는 기본적으로 None을 반환한다.', answer: true, exp: 'return 값이 없거나 명시되지 않은 파이썬 함수는 항상 None 객체를 반환합니다.' },
-      { id: 6, type: 'mc', question: '파이썬의 변수 이름 탐색 순서인 LEGB 규칙에서 G가 의미하는 바는?', options: ['General', 'Global', 'Group', 'Gather'], answer: 1, exp: 'LEGB는 Local -> Enclosing -> Global -> Built-in 유효범위 순서를 의미합니다.' },
-      { id: 7, type: 'code', question: 'x = 10\ndef foo():\n    x = 20\nfoo()\nprint(x) 의 출력 결과는?', options: ['10', '20', 'None', 'Error'], answer: 0, exp: 'foo() 내의 x는 지역 변수이므로 전역 변수 x = 10에는 영향을 주지 않습니다.' },
-      { id: 8, type: 'tf', question: '함수 내부에서 전역 변수의 값을 직접 수정하려면 global 키워드 선언이 필요하다.', answer: true, exp: '전역 변수를 함수 내부에서 재할당/수정하려면 `global 변수명` 선언이 필수입니다.' },
-      { id: 9, type: 'mc', question: '키워드 인자를 딕셔너리(Dict) 형태로 수집하는 매개변수 표기법은?', options: ['*args', '**kwargs', 'dict_args', '&&kwargs'], answer: 1, exp: '**kwargs는 가변 키워드 인자들을 딕셔너리로 받아옵니다.' },
-      { id: 10, type: 'code', question: 'def calc(a, b):\n    return a+b, a*b\nres = calc(2, 3)\nprint(type(res)) 의 출력 결과는?', options: ['<class "list">', '<class "tuple">', '<class "dict">', '<class "int">'], answer: 1, exp: '파이썬에서 여러 값을 쉼표로 구별하여 return 하면 하나의 Tuple로 패킹되어 반환됩니다.' },
-      { id: 11, type: 'mc', question: '파이썬에서 고성능 다차원 수치 배열 처리에 특화된 핵심 라이브러리는?', options: ['Pandas', 'NumPy', 'Matplotlib', 'Requests'], answer: 1, exp: 'NumPy는 C언어로 구현된 고성능 ndarray 다차원 배열 연산을 제공합니다.' },
-      { id: 12, type: 'tf', question: '중첩 함수에서 바로 상위 외각 함수의 변수를 수정할 때는 `nonlocal` 키워드를 사용한다.', answer: true, exp: 'nonlocal은 전역이 아닌 가장 가까운 상위 Enclosing 범주의 변수를 지정합니다.' },
-      { id: 13, type: 'code', question: 'def func(*args):\n    return len(args)\nprint(func(1, 2, 3, 4, 5)) 의 출력값은?', options: ['1', '5', '15', 'Error'], answer: 1, exp: 'args 튜플에 (1, 2, 3, 4, 5) 5개의 요소가 담기므로 길이는 5입니다.' },
-      { id: 14, type: 'mc', question: '2차원 표 형태(행과 열)의 데이터프레임(DataFrame) 구조를 제공하는 데이터 분석 라이브러리는?', options: ['NumPy', 'Pandas', 'Matplotlib', 'Seaborn'], answer: 1, exp: 'Pandas 라이브러리가 Series와 DataFrame 데이터 구조를 제공합니다.' },
-      { id: 15, type: 'code', question: 'sqr = list(map(lambda x: x**2, [1, 2, 3]))\nprint(sqr) 의 출력 결과는?', options: ['[1, 4, 9]', '[1, 2, 3]', '14', '[1, 8, 27]'], answer: 0, exp: 'map을 통해 각 요소 1, 2, 3에 거듭제곱 람다가 적용되어 [1, 4, 9]가 됩니다.' },
-      { id: 16, type: 'tf', question: '함수의 디폴트 매개변수로 가변 객체(예: 빈 리스트 [])를 사용하는 것은 안전한 권장 사항이다.', answer: false, exp: '가변 객체를 기본 인자로 지정하면 함수 호출 간 상태가 공유되는 심각한 버그가 생기므로 None을 쓰는 것이 권장됩니다.' },
-      { id: 17, type: 'mc', question: '파이썬 데이터 시각화 그래프를 그리는 가장 표준적인 모듈은?', options: ['matplotlib.pyplot', 'numpy.random', 'pandas.data', 'sys.path'], answer: 0, exp: 'matplotlib.pyplot 모듈이 2D 그래프 작성을 위한 표준 API를 제공합니다.' },
-      { id: 18, type: 'code', question: 'def greet(name="학생"):\n    return f"안녕, {name}"\nprint(greet("철수")) 의 결과는?', options: ['안녕, 학생', '안녕, 철수', '안녕, name', 'Error'], answer: 1, exp: '인자로 "철수"가 명시적으로 전달되었으므로 디폴트값 대신 "안녕, 철수"가 됩니다.' },
-      { id: 19, type: 'tf', question: '재귀 함수(Recursive Function)는 자기 자신을 재호출하는 구조의 함수이다.', answer: true, exp: '재귀 함수는 문제를 더 작은 단위로 분할하기 위해 자기 자신을 호출합니다.' },
-      { id: 20, type: 'code', question: 'def f(a, b, c):\n    return a + b * c\nprint(f(c=2, b=3, a=1)) 의 출력값은?', options: ['7', '8', '9', 'Error'], answer: 0, exp: '키워드 인자로 지정하였으므로 a=1, b=3, c=2가 적용되어 1 + 3 * 2 = 7 이 됩니다.' }
-    ]
-  },
-  {
-    id: 'files',
-    title: '6. 파일 처리',
-    sub: 'File I/O & Exceptions',
-    icon: FileCode,
-    color: 'from-blue-500 to-indigo-700',
-    accentColor: 'blue',
-    concepts: [
-      {
-        title: '🌱 쉬운 개념: 파일 처리 절차 및 읽기/쓰기 모드',
-        content: `저장 장치(SSD/하드디스크)에 파일 형태로 데이터를 저장하거나 가져오는 과정입니다.
-
-• **기본 처리 절차**: \`파일 열기(open)\` -> \`데이터 읽기/쓰기\` -> \`파일 닫기(close)\`
-
-• **파일 열기 모드**:
-  - \`'r'\`: 읽기 모드 (파일이 없으면 오류)
-  - \`'w'\`: 쓰기 모드 (새로 작성, 기존 내용 덮어씀)
-  - \`'a'\`: 추가 모드 (기존 내용 뒤에 이어 쓰기)
-
-• **주요 읽기/쓰기 메서드**:
-  - \`f.read()\`: 파일 전체를 하나의 문자열로 읽음
-  - \`f.readline()\`: 한 줄씩 문자열로 읽음
-  - \`f.readlines()\`: 파일 전체를 한 줄씩 쪼개어 리스트 형태로 읽음
-  - \`f.write("문자열")\`: 파일에 데이터를 기록
-
-• **\`with\` 문 구문**:
-  \`with open("data.txt", "r") as f:\` 구문을 사용하면 파일이 자동으로 close 됩니다.`,
-        code: `# with문을 활용한 파일 입출력 예시
-with open("test.txt", "w", encoding="utf-8") as f:
-    f.write("첫 번째 줄입니다.\\n")
-    f.write("두 번째 줄입니다.\\n")
-
-with open("test.txt", "r", encoding="utf-8") as f:
-    text = f.read()
-    print("--- 파일 내용 ---")
-    print(text)`
-      },
-      {
-        title: '🚀 심화 깊이보기: 예외 처리 (try-except-else-finally)',
-        content: `■ **예외 처리 구문 구조:**
-- **\`try\`**: 예외가 발생할 가능성이 있는 코드 실행
-- **\`except\`**: 예외 발생 시 구출하여 실행되는 블록
-- **\`else\`**: 예외가 **발생하지 않았을 때만** 실행되는 블록
-- **\`finally\`**: 예외 발생 여부와 상관없이 **무조건 마지막에 실행**되는 자원 해제 블록`,
-        code: `try:
-    num = int("100")
-    result = 10 / num
-except ZeroDivisionError:
-    print("0으로 나눌 수 없습니다.")
-except ValueError:
-    print("숫자 형식 변환 에러")
-else:
-    print("연산 성공:", result)
-finally:
-    print("프로그램 종료 자원 정돈")`
-      }
-    ],
-    quizzes: [
-      { id: 1, type: 'mc', question: '기존 파일의 내용을 덮어쓰지 않고 끝에 덧붙여 쓰고자 할 때 쓰는 open 모드는?', options: ['"r"', '"w"', '"a"', '"x"'], answer: 2, exp: '"a" (append) 모드는 파일의 끝부분에 데이터를 추가합니다.' },
-      { id: 2, type: 'tf', question: '`with open(...)` 구문을 사용하면 파일 작업이 완료된 후 close()를 호출하지 않아도 자동으로 파일이 닫힌다.', answer: true, exp: 'with 문은 컨텍스트 매니저를 통해 자원 해제(close)를 자동 보장합니다.' },
-      { id: 3, type: 'mc', question: '파일 전체 내용을 줄 단위로 나누어 "리스트(List)"로 반환하는 메서드는?', options: ['read()', 'readline()', 'readlines()', 'readall()'], answer: 2, exp: 'readlines() 메서드가 각 라인을 요소로 하는 문자열 리스트를 반환합니다.' },
-      { id: 4, type: 'code', question: 'f.readline()을 처음 호출할 때 반환되는 데이터의 타입은?', options: ['str', 'list', 'dict', 'tuple'], answer: 0, exp: 'readline()은 파일의 단일 한 줄을 문자열(str)로 반환합니다.' },
-      { id: 5, type: 'mc', question: '이미지나 음성 같은 바이너리 이진 데이터를 읽고 쓸 때 사용하는 모드 플래그는?', options: ['t', 'b', 'bin', 'raw'], answer: 1, exp: '바이너리 모드는 "rb", "wb" 처럼 "b" 플래그를 결합하여 사용합니다.' },
-      { id: 6, type: 'tf', question: '"r" (읽기) 모드로 존재하지 않는 파일을 열려고 시도하면 FileNotFoundError 예외가 발생한다.', answer: true, exp: '읽기 모드("r")는 파일이 존재하지 않을 시 예외를 발생시킵니다.' },
-      { id: 7, type: 'code', question: '# txt 파일에 "A\\nB\\nC"가 저장되어 있음\nwith open("t.txt") as f:\n    data = f.read()\nprint(len(data.splitlines())) 의 출력 결과는?', options: ['1', '3', '5', 'Error'], answer: 1, exp: 'splitlines()는 줄바꿈 기준으로 나누므로 3개의 라인이 생성되어 길이는 3입니다.' },
-      { id: 8, type: 'mc', question: '다음 중 예외 처리 구문에서 에러 발생 여부와 상관없이 무조건 마지막에 실행되는 블록은?', options: ['except', 'else', 'finally', 'always'], answer: 2, exp: 'finally 블록은 예외 발생 및 정상 수행 여부와 관계없이 항상 호출됩니다.' },
-      { id: 9, type: 'tf', question: '"w" (쓰기) 모드로 기존에 이미 존재하던 파일명을 지정하여 열면 기존 데이터가 지워진다.', answer: true, exp: '쓰기 모드("w")는 파일이 이미 존재하면 기존 내용을 삭제(Truncate)하고 새로 만듭니다.' },
-      { id: 10, type: 'code', question: 'try:\n    x = 10 / 0\nexcept ZeroDivisionError:\n    print("Z", end="")\nelse:\n    print("E", end="")\nprint("D")', options: ['ZD', 'ED', 'ZED', 'ZeroDivisionError'], answer: 0, exp: '예외가 발생했으므로 except 블록만 실행되어 "Z", 그리고 마지막 print("D")로 인해 "ZD"가 출력됩니다.' },
-      { id: 11, type: 'mc', question: '파일이 이미 존재할 경우 FileExistsError 예외를 발생시켜 새로 생성을 방지하는 모드는?', options: ['"r"', '"w"', '"x"', '"a"'], answer: 2, exp: '"x" (Exclusive creation) 모드는 파일이 없을 때만 새 파일을 만듭니다.' },
-      { id: 12, type: 'code', question: 'with open("a.txt", "w") as f:\n    f.writelines(["Hi\\n", "Bye"])\n# 기록된 파일의 총 줄 수는?', options: ['1줄', '2줄', '3줄', '0줄'], answer: 1, exp: 'writelines는 리스트 내 원소를 기록하며 "Hi\\n"과 "Bye" 2줄이 작성됩니다.' },
-      { id: 13, type: 'tf', question: 'try-except 구문에서 else 블록은 예외가 발생하지 않고 정상 종료되었을 때만 실행된다.', answer: true, exp: 'else 블록은 except 절을 거치지 않은 정상 처리 상황에서 실행됩니다.' },
-      { id: 14, type: 'mc', question: '한글 등 유니코드 텍스트가 깨지지 않도록 open() 함수 인자로 지정하는 키워드는?', options: ['code="utf-8"', 'encoding="utf-8"', 'format="utf-8"', 'type="utf-8"'], answer: 1, exp: 'encoding="utf-8" 매개변수를 지정해야 유니코드 한글 텍스트를 바르게 입출력합니다.' },
-      { id: 15, type: 'code', question: 'try:\n    a = int("abc")\nexcept ValueError:\n    print("ERR") 의 출력값은?', options: ['abc', 'ValueError', 'ERR', 'None'], answer: 2, exp: '"abc"를 정수로 형변환할 수 없으므로 ValueError가 발생하여 "ERR"이 출력됩니다.' },
-      { id: 16, type: 'tf', question: 'f.seek(0) 메서드는 파일 포인터(위치)를 파일의 맨 처음으로 이동시킨다.', answer: true, exp: 'seek(offset) 함수는 파일 포인터의 위치를 이동시키는 역할을 합니다.' },
-      { id: 17, type: 'mc', question: '사용자가 의도적으로 직접 예외를 발생시키고자 할 때 사용하는 파이썬 키워드는?', options: ['throw', 'raise', 'error', 'dispatch'], answer: 1, exp: '파이썬에서는 `raise Exception("메시지")` 형태로 예외를 발생시킵니다.' },
-      { id: 18, type: 'code', question: 'with open("n.txt", "w") as f:\n    res = f.write("12345")\nprint(res) 의 출력값은?', options: ['True', '5', '12345', 'None'], answer: 1, exp: 'write() 메서드는 파일에 성공적으로 쓴 문자열의 길이(문자 수 5)를 반환합니다.' },
-      { id: 19, type: 'tf', question: '파일 입출력 시 f.tell() 함수는 현재 파일 포인터의 위치 인덱스를 반환한다.', answer: true, exp: 'tell() 메서드는 파일 내에서 현재 위치 바이트 바이트 오프셋을 반환합니다.' },
-      { id: 20, type: 'code', question: 'try:\n    assert 1 == 2\nexcept AssertionError:\n    print("FAIL") 의 출력값은?', options: ['FAIL', 'True', 'False', 'Pass'], answer: 0, exp: 'assert 조건문이 False이므로 AssertionError가 발생하여 "FAIL"이 출력됩니다.' }
-    ]
-  }
-];
-
-// --- CODE SANDBOX INITIAL TEMPLATES ---
-const CODE_TEMPLATES = {
-  variables: `# [Topic 1] 변수와 자료형 실습
-a = [10, 20, 30]
-b = a
-b.append(40)
-
-print(f"a의 원소: {a}")
-print(f"a와 b는 같은 객체인가? {a is b}")
-print(f"a의 메모리 주소: {hex(id(a))}")
-
-data_tuple = (1, 2, "파이썬")
-print(f"튜플 요소: {data_tuple}")`,
-  io: `# [Topic 2] 입출력 및 f-string 포매팅
-name = "홍길동"
+        const TOPICS_DATA = [
+            {
+                id: 'variables',
+                title: '1. 변수와 자료형',
+                sub: 'Variables & Data Types',
+                easy: `• 변수(Variable): 자룟값을 저장하는 메모리 공간의 이름(그릇)입니다.
+• 대입 연산자 (=): 우변의 값을 좌변의 변수에 할당합니다.
+• 기본 자료형:
+  - int (정수형): 소수점 없는 수 (예: 10, -5)
+  - float (실수형): 소수점 있는 수 (예: 3.14)
+  - str (문자열): 따옴표로 감싼 글자 (예: "파이썬")
+  - bool (논리형): True 또는 False
+• 컨테이너 구조:
+  - list [ ]: 순서가 있고 수정 가능한 데이터 목록 (Mutable)
+  - tuple ( ): 순서가 있으나 수정 불가능한 읽기 전용 (Immutable)
+  - dict { }: 키(Key)와 값(Value)의 쌍 구조
+  - set { }: 중복을 허용하지 않고 순서가 없는 집합`,
+                detail: `파이썬의 모든 변수는 메모리 상의 객체를 가리키는 포인터(참조)입니다. 
+- id(x): 변수의 고유 메모리 주소를 반환합니다.
+- type(x): 변수의 자료형 클래스를 반환합니다.
+- 파이썬은 -5부터 256까지의 정수를 정적 메모리에 얕은 캐싱(Small Int Caching) 처리합니다.
+- 가변(Mutable: list, dict, set) 객체와 불변(Immutable: int, float, str, tuple) 객체의 메모리 동작 원리가 다릅니다.`,
+                code: `# 변수 및 자료 구조 실습
 age = 18
-height = 175.86
+name = "홍길동"
+scores = [90, 85, 95]
+user_info = {"id": 101, "role": "student"}
 
-# f-string 출력 format
-print(f"=== {name} 학생 프로필 ===")
-print(f"나이: {age}세, 키: {height:.1f}cm")
+print(f"{name}({age}세)의 평균 점수: {sum(scores)/len(scores):.1f}")
+print("역순 정렬:", sorted(scores, reverse=True))`,
+                sandboxInit: `a = [1, 2, 3]
+b = a
+b.append(4)
+print("a의 값:", a)
+print("a와 b는 동일 메모리인가?", a is b)`,
+                quizzes: [
+                    { id: 1, type: 'mc', question: '다음 중 변경이 불가능한(Immutable) 자료형은?', options: ['List', 'Dict', 'Set', 'Tuple'], answer: 3, exp: 'Tuple은 한번 생성되면 내부 요소를 수정하거나 삭제할 수 없는 Immutable 자료형입니다.' },
+                    { id: 2, type: 'tf', question: '파이썬에서 bool 타입은 내부적으로 정수형(int)의 서브클래스이다.', answer: true, exp: 'True는 1, False는 0의 정수값을 가지므로 True + True = 2가 됩니다.' },
+                    { id: 3, type: 'code', question: 'x = [1, 2, 3]\ny = x\ny.append(4)\nprint(len(x)) 의 실행 결과는?', options: ['3', '4', 'Error', 'None'], answer: 1, exp: '리스트는 가변 객체이므로 y와 x가 같은 메모리를 참조합니다.' },
+                    { id: 4, type: 'mc', question: '변수의 고유 메모리 주소를 반환하는 파이썬 내장 함수는?', options: ['address()', 'id()', 'mem()', 'pointer()'], answer: 1, exp: 'id() 함수는 객체의 고유 메모리 식별 주소를 반환합니다.' },
+                    { id: 5, type: 'tf', question: 'Dictionary의 Key값으로 List를 사용할 수 있다.', answer: false, exp: 'Key는 해시 불가능한 가변(Mutable) 객체인 List를 사용할 수 없습니다.' },
+                    { id: 6, type: 'code', question: 'print(type(3.14) == float) 의 결과는?', options: ['True', 'False', 'float', 'Error'], answer: 0, exp: 'type(3.14)는 float 타입 객체이므로 float과의 비교는 True입니다.' },
+                    { id: 7, type: 'mc', question: '다음 중 중복을 허용하지 않고 순서가 없는 자료형은?', options: ['List', 'Tuple', 'Dictionary', 'Set'], answer: 3, exp: 'Set(집합)은 요소의 중복을 배제하고 순서가 없습니다.' },
+                    { id: 8, type: 'code', question: 's = "Python"\nprint(s[1:4]) 의 출력 결과는?', options: ['Pyt', 'yth', 'ytho', 'Pyt'], answer: 1, exp: '인덱스 1부터 3까지(1, 2, 3)를 슬라이싱하므로 "yth"입니다.' },
+                    { id: 9, type: 'tf', question: '원소가 1개인 튜플을 만들 때는 (1,) 처럼 콤마를 붙여야 한다.', answer: true, exp: '콤마가 없으면 일반 괄호 연산자로 인식되어 정수로 처리됩니다.' },
+                    { id: 10, type: 'mc', question: '문자열을 대문자로 변환하는 메서드는?', options: ['toUpper()', 'upper()', 'capitalize()', 'uppercase()'], answer: 1, exp: 'str.upper() 메서드가 전체 문자열을 대문자로 바꿉니다.' },
+                    { id: 11, type: 'code', question: 'd = {"a": 1, "b": 2}\nprint(d.get("c", 0)) 의 출력값은?', options: ['None', 'KeyError', '0', 'False'], answer: 2, exp: 'get(key, default)는 키가 없으면 디폴트값 0을 반환합니다.' },
+                    { id: 12, type: 'tf', question: '파이썬의 문자열(str)은 인덱스로 문자를 직접 수정할 수 있다.', answer: false, exp: '문자열은 불변 객체이므로 s[0] = "A" 형태의 수정이 불가능합니다.' },
+                    { id: 13, type: 'mc', question: '16진수 정수 표기 접두사로 올바른 것은?', options: ['0b', '0o', '0x', '0h'], answer: 2, exp: '0x는 16진수, 0b는 2진수, 0o는 8진수 표기법입니다.' },
+                    { id: 14, type: 'code', question: 'lst = [1, 2, 3, 4, 5]\nprint(lst[::-1]) 의 결과는?', options: ['[1, 2, 3, 4, 5]', '[5, 4, 3, 2, 1]', '[5]', 'Error'], answer: 1, exp: '[::-1] 역순 슬라이싱은 전체를 반대로 뒤집어 반환합니다.' },
+                    { id: 15, type: 'tf', question: 'a = [1, 2], b = [1, 2] 일 때 (a is b)는 True이다.', answer: false, exp: '값은 같지만(== True), 서로 다른 메모리 객체이므로 is 비교는 False입니다.' },
+                    { id: 16, type: 'mc', question: '비어있는 Set을 생성하는 올바른 문법은?', options: ['s = {}', 's = set()', 's = Set()', 's = []'], answer: 1, exp: '{}는 빈 Dictionary를 만듭니다. 빈 집합은 set()으로 생성합니다.' },
+                    { id: 17, type: 'code', question: 'z = 3 + 4j\nprint(z.imag) 의 결과는?', options: ['3.0', '4.0', '4', '7.0'], answer: 1, exp: 'imag 속성은 복소수의 허수부(float)를 반환합니다.' },
+                    { id: 18, type: 'tf', question: 'del 키워드는 변수와 메모리 객체 간의 연결을 끊는다.', answer: true, exp: 'del 변수명은 해당 변수의 식별 연결을 해제합니다.' },
+                    { id: 19, type: 'mc', question: '다음 중 실수(3.0)를 정수로 변환하는 함수는?', options: ['int("3.0")', 'int(3.0)', 'to_int(3.0)', 'parse_int(3.0)'], answer: 1, exp: 'int(3.0)은 정수 3을 반환합니다.' },
+                    { id: 20, type: 'code', question: 'print("_".join(["a", "b"])) 의 출력 결과는?', options: ['a_b', 'ab', '_a_b_', 'Error'], answer: 0, exp: 'join()은 리스트 요소들 사이에 구분 기호를 삽입하여 합칩니다.' }
+                ]
+            },
+            {
+                id: 'io',
+                title: '2. 입력과 출력',
+                sub: 'Input & Output Operations',
+                easy: `• 표준 입력 input(): 키보드로 사용자의 입력을 받습니다. 기본 반환형은 항상 문자열(str)입니다.
+• 형 변환(Casting): 수치 연산을 하려면 int(input()) 또는 float(input())으로 변환해야 합니다.
+• 표준 출력 print(): 모니터에 결과를 표시합니다.
+  - sep: 요소 사이 구분 기호 (기본값: 공백 ' ')
+  - end: 출력 끝 문자 (기본값: 줄바꿈 '\\n')
+• 이스케이프 문자: \\n (줄바꿈), \\t (탭 간격), \\\\ (백슬래시)`,
+                detail: `f-string 포매팅(f"{val:.2f}")은 기존의 % 포매팅 및 format() 메서드보다 읽기 쉽고 실행 속도가 빠릅니다.
+대량의 입력을 받아야 하는 알고리즘 문제에서는 sys.stdin.readline().rstrip()을 사용하는 것이 input()보다 10배 이상 빠릅니다.`,
+                code: `# 표준 입출력 및 f-string 서식
+name = "이순신"
+score = 98.765
 
-# sep & end 테스트
-print("Python", "Quiz", "Hub", sep=" ★ ", end="!\\n")`,
-  operators: `# [Topic 3] 연산자 & 단락 평가 (Short-Circuit)
-x = 15
-y = 4
+print(f"학생 이름: {name}")
+print(f"최종 성적: {score:.2f}점") # 소수점 둘째 자리
+print("A", "B", "C", sep=" -> ", end=" [끝]\n")`,
+                sandboxInit: `val1 = "10"
+val2 = "20"
+print("문자열 결합:", val1 + val2)
+print("정수 변환 합:", int(val1) + int(val2))`,
+                quizzes: [
+                    { id: 1, type: 'mc', question: 'input() 함수가 사용자로부터 받아오는 기본 자료형은?', options: ['int', 'float', 'str', 'bool'], answer: 2, exp: 'input()은 언제나 문자열(str) 형태로 입력을 받아옵니다.' },
+                    { id: 2, type: 'code', question: 'print("A", "B", sep="-") 의 출력 결과는?', options: ['A B', 'A-B', 'A-B-', 'AB'], answer: 1, exp: 'sep="-" 인자에 의해 항목 사이에 "-" 기호가 붙습니다.' },
+                    { id: 3, type: 'tf', question: 'print() 함수는 호출 시 기본적으로 끝에 줄바꿈(\\n)이 일어난다.', answer: true, exp: 'end 매개변수의 기본값이 "\\n"이기 때문입니다.' },
+                    { id: 4, type: 'code', question: 'print("Hello", end="")\nprint("World") 의 결과는?', options: ['Hello World', 'Hello\\nWorld', 'HelloWorld', 'Error'], answer: 2, exp: 'end=""로 줄바꿈을 제거하여 바로 이어져 출력이 이루어집니다.' },
+                    { id: 5, type: 'mc', question: '탭(Tab) 간격을 띄우는 이스케이프 문자는?', options: ['\\n', '\\t', '\\r', '\\b'], answer: 1, exp: '\\t는 탭 간격을 의미합니다.' },
+                    { id: 6, type: 'tf', question: 'sys.stdin.readline()은 input()보다 데이터 처리 속도가 빠르다.', answer: true, exp: '버퍼 입출력을 사용하는 sys.stdin.readline()이 속도가 훨씬 높습니다.' },
+                    { id: 7, type: 'code', question: 'x = 10\nprint(f"{x * 2}") 의 출력 결과는?', options: ['x * 2', '20', '102', 'Error'], answer: 1, exp: 'f-string 내부 {} 안의 수식이 직접 계산되어 20이 출력됩니다.' },
+                    { id: 8, type: 'mc', question: '실수 x를 소수점 둘째 자리까지 표시하는 f-string 표현은?', options: ['f"{x:2f}"', 'f"{x:.2f}"', 'f"{x%2f}"', 'f"{x;.2f}"'], answer: 1, exp: '소수점 표현식 규칙은 {변수:.nf} 형태입니다.' },
+                    { id: 9, type: 'tf', question: 'raw string(예: r"C:\\new")은 이스케이프 문자를 무시하고 문자를 그대로 표현한다.', answer: true, exp: 'r 접두사는 백슬래시 이스케이프 해석을 비활성화합니다.' },
+                    { id: 10, type: 'code', question: 'print("123".zfill(5)) 의 결과는?', options: ['12300', '00123', '  123', '123  '], answer: 1, exp: 'zfill(5)는 전체 길이 5가 되도록 앞쪽에 0을 채웁니다.' },
+                    { id: 11, type: 'mc', question: '문자열 분할 시 사용하는 메서드는?', options: ['join()', 'split()', 'slice()', 'cut()'], answer: 1, exp: 'split() 메서드가 문자열을 구분자로 분할하여 리스트로 만듭니다.' },
+                    { id: 12, type: 'tf', question: 'print(1, 2, sep="") 의 출력값은 12이다.', answer: true, exp: 'sep이 빈 문자열이므로 공백 없이 12가 됩니다.' },
+                    { id: 13, type: 'code', question: 'a, b = map(int, ["10", "20"])\nprint(a + b) 의 결과는?', options: ['1020', '30', 'Error', 'None'], answer: 1, exp: 'map(int, ...)에 의해 두 요소가 정수로 변환되어 30이 됩니다.' },
+                    { id: 14, type: 'mc', question: '큰따옴표 안에서 큰따옴표 자체를 표현할 때 사용하는 기호는?', options: ['\\"', '""', '/"', '%"'], answer: 0, exp: '\\" 형태로 이스케이프 처리합니다.' },
+                    { id: 15, type: 'tf', question: 'print()의 file 매개변수로 출력을 파일로 보낼 수 있다.', answer: true, exp: 'file=f 옵션으로 표준 출력을 지정 파일로 우회할 수 있습니다.' },
+                    { id: 16, type: 'code', question: 'print("A\\nB").count("\\n") 의 결과는?', options: ['0', '1', '2', 'Error'], answer: 1, exp: '문자열 내부의 \\n 개수는 1개입니다.' },
+                    { id: 17, type: 'mc', question: '다음 중 파이썬 문자열 포매팅 방식이 아닌 것은?', options: ['% 포매팅', 'format()', 'f-string', 'dollar($) 포매팅'], answer: 3, exp: '$ 포매팅은 파이썬 표준 포매팅 구문이 아닙니다.' },
+                    { id: 18, type: 'tf', question: 'input().split(",")는 쉼표를 기준으로 입력을 나눈다.', answer: true, exp: 'split() 인자로 구분 기준 문자를 지정할 수 있습니다.' },
+                    { id: 19, type: 'code', question: 'print("It\'s Python") 의 출력 결과는 정상 작동한다.', answer: true, exp: '큰따옴표 감싸기 또는 이스케이프를 사용하면 따옴표 출력이 정상 가능합니다.' },
+                    { id: 20, type: 'mc', question: 'print(f"{7:04d}") 의 출력값은?', options: ['7000', '0007', '   7', '7.000'], answer: 1, exp: '04d는 4자리 공간 중 빈 곳을 0으로 채우는 정수 서식입니다.' }
+                ]
+            },
+            {
+                id: 'operators',
+                title: '3. 연산자',
+                sub: 'Operators & Precedence',
+                easy: `• 산술 연산자: + (더하기), - (빼기), * (곱하기), / (나누기 - 결과 float), // (몫), % (나머지), ** (제곱)
+• 비교 연산자: == (같다), != (다르다), >, <, >=, <= (결과는 True/False)
+• 논리 연산자: and (둘 다 참), or (하나라도 참), not (반전)
+• 비트 연산자: &, |, ^, ~, <<, >>`,
+                detail: `단락 평가 (Short-Circuit Evaluation):
+- A and B: A가 거짓이면 B를 평가하지 않고 A를 즉시 반환.
+- A or B: A가 참이면 B를 평가하지 않고 A를 즉시 반환.
+연산자 우선순위: 괄호 () > 제곱 ** > 곱셈/나눗셈 (*, /, //, %) > 덧셈/뺄셈 (+, -) > 비교 연산자 > 논리 연산자 (not > and > or).`,
+                code: `# 연산자 및 단락 평가 예시
+a = 15
+b = 4
 
-print(f"몫 연산 (15 // 4): {x // y}")
-print(f"나머지 연산 (15 % 4): {x % y}")
-print(f"거듭제곱 (2 ** 10): {2 ** 10}")
+print("몫 (//):", a // b)
+print("나머지 (%):", a % b)
+print("제곱 (**):", 2 ** 5)
 
-# 단락 평가 검증
-result = (x > 10) or (y / 0 == 0)
-print(f"단락 평가 결과: {result}")`,
-  control: `# [Topic 4] 제어문 & 반복문
+# 단락 평가로 ZeroDivisionError 방지
+x = 0
+result = (x != 0) and (10 / x > 1)
+print("안전한 평가 결과:", result)`,
+                sandboxInit: `print(7 // 2)
+print(7 / 2)
+print(2 ** 3 ** 2) # 우측 결합 주의`,
+                quizzes: [
+                    { id: 1, type: 'code', question: 'print(7 // 2) 의 출력 결과는?', options: ['3.5', '3', '4', '2'], answer: 1, exp: '// 연산자는 나눗셈 후 정수 몫만 반환합니다.' },
+                    { id: 2, type: 'code', question: 'print(2 ** 3 ** 2) 의 결과는?', options: ['64', '512', '36', '81'], answer: 1, exp: '** 연산자는 우측부터 결합되므로 2 ** (3 ** 2) = 2 ** 9 = 512 입니다.' },
+                    { id: 3, type: 'mc', question: '나누기 결과가 항상 float(실수)이 되는 연산자는?', options: ['//', '%', '/', 'div'], answer: 2, exp: '/ 연산자는 피연산자가 모두 정수라도 float 결과를 반환합니다.' },
+                    { id: 4, type: 'code', question: 'print(5 == 5.0) 의 결과는?', options: ['True', 'False', 'Error', 'None'], answer: 0, exp: '== 연산자는 값을 비교하므로 정수 5와 실수 5.0은 참입니다.' },
+                    { id: 5, type: 'tf', question: '`a is b` 연산자는 두 변수의 값(Value)이 같은지 비교한다.', answer: false, exp: 'is 연산자는 값이 아닌 메모리 객체 주소(Identity)를 비교합니다.' },
+                    { id: 6, type: 'code', question: 'print(3 and 5) 의 출력 결과는?', options: ['True', 'False', '3', '5'], answer: 3, exp: 'and 연산자는 앞이 참이면 뒤의 평가값인 5를 반환합니다.' },
+                    { id: 7, type: 'code', question: 'print(0 or "Python") 의 출력 결과는?', options: ['0', '"Python"', 'True', 'False'], answer: 1, exp: '0은 거짓이므로 or 연산자는 다음 값인 "Python"을 반환합니다.' },
+                    { id: 8, type: 'mc', question: '비트 연산자 중 XOR(서로 다를 때 1)을 나타내는 기호는?', options: ['&', '|', '^', '~'], answer: 2, exp: '^ 기호가 비트 XOR 연산자입니다.' },
+                    { id: 9, type: 'tf', question: '파이썬에서는 `1 < x < 10`과 같은 연속 비교 연산이 가능하다.', answer: true, exp: '파이썬은 연쇄 비교(Chained Comparison) 구문을 공식 지원합니다.' },
+                    { id: 10, type: 'code', question: 'print(not []) 의 결과는?', options: ['True', 'False', '[]', 'Error'], answer: 0, exp: '빈 리스트 []는 거짓(Falsy)이므로 not [] 은 True가 됩니다.' },
+                    { id: 11, type: 'mc', question: '비트를 좌측으로 이동시켜 2배씩 곱셈 효과를 주는 연산자는?', options: ['>>', '<<', '**', '//'], answer: 1, exp: '<< (Left shift) 연산자입니다.' },
+                    { id: 12, type: 'code', question: 'print(10 % 3) 의 출력값은?', options: ['3', '1', '3.33', '0'], answer: 1, exp: '% 연산자는 나머지인 1을 구합니다.' },
+                    { id: 13, type: 'tf', question: '`False and (1/0)` 코드는 ZeroDivisionError 예외가 일어난다.', answer: false, exp: '단락 평가에 의해 첫 번째 조건이 False이므로 뒤의 (1/0)을 평가하지 않습니다.' },
+                    { id: 14, type: 'code', question: 'print(~0) 의 결과는?', options: ['0', '1', '-1', '-2'], answer: 2, exp: '비트 NOT(~)은 -(x + 1)이 되므로 ~0 은 -1입니다.' },
+                    { id: 15, type: 'mc', question: '특정 요소가 시퀀스 내에 포함되어 있는지 확인하는 연산자는?', options: ['has', 'in', 'exist', 'contains'], answer: 1, exp: 'in 연산자가 멤버십 존재 여부를 확인합니다.' },
+                    { id: 16, type: 'code', question: 'print("a" in "cat") 의 결과는?', options: ['True', 'False', 'Error', '1'], answer: 0, exp: '"cat" 문자열 내에 "a" 문자가 포함되어 있으므로 True입니다.' },
+                    { id: 17, type: 'tf', question: '곱셈(*)과 나눗셈(/)은 덧셈(+)보다 연산 우선순위가 높다.', answer: true, exp: '수학과 마찬가지로 곱셈/나눗셈이 먼저 계산됩니다.' },
+                    { id: 18, type: 'code', question: 'print(4 & 5) 의 비트 AND 연산 결과는?', options: ['4', '5', '9', '1'], answer: 0, exp: '4(100_2) & 5(101_2) = 100_2 (4) 입니다.' },
+                    { id: 19, type: 'mc', question: '파이썬 삼항 연산자(조건 표현식)의 올바른 구문은?', options: ['x > 0 ? "A" : "B"', '"A" if x > 0 else "B"', 'if x > 0 then "A" else "B"', 'x > 0 -> "A" : "B"'], answer: 1, exp: '[참일때 값] if [조건] else [거짓일때 값] 구조입니다.' },
+                    { id: 20, type: 'tf', question: '복합 대입 연산자 `x += 3`은 `x = x + 3`과 동등하다.', answer: true, exp: '+= 는 누적 덧셈 대입 연산자입니다.' }
+                ]
+            },
+            {
+                id: 'control',
+                title: '4. 제어문',
+                sub: 'Control Flow (if, for, while)',
+                easy: `• 조건문 (Selection):
+  - if 조건: 참일 때 실행
+  - elif 조건: 이전 조건이 거짓일 때 다음 조건 검사
+  - else: 모든 조건이 거짓일 때 실행
+• 반복문 (Iteration):
+  - for 변수 in sequence: 요소 수만큼 순차적 반복 (range() 활용)
+  - while 조건식: 조건이 참인 동안 지속 반복
+• 흐름 제어:
+  - break: 반복문 즉시 완전히 탈출
+  - continue: 다음 반복 회차로 건너뜀`,
+                detail: `Loop else 구문:
+- for나 while 루프 끝에 else: 블록을 작성할 수 있습니다.
+- 루프 내부에서 break를 만나지 않고 정상적으로 루프가 끝까지 실행되었을 때만 else 블록이 수행됩니다.
+- 들여쓰기(Indentation): 파이썬은 중괄호 {} 대신 4칸 들여쓰기로 코드 블록 구문을 구분합니다.`,
+                code: `# 조건문 및 반복문 실습
 scores = [85, 92, 45, 78, 60]
-pass_count = 0
 
-for idx, score in enumerate(scores, start=1):
+for idx, score in enumerate(scores, 1):
     if score >= 60:
-        status = "합격"
-        pass_count += 1
+        result = "합격"
     else:
-        status = "불합격"
-    print(f"{idx}번 학생: {score}점 -> {status}")
+        result = "불합격"
+    print(f"{idx}번: {score}점 -> {result}")`,
+                sandboxInit: `for i in range(1, 6):
+    if i == 3:
+        continue
+    print(i, end=" ")`,
+                quizzes: [
+                    { id: 1, type: 'code', question: 'sum_val = 0\nfor i in range(1, 4):\n    sum_val += i\nprint(sum_val) 의 결과는?', options: ['6', '10', '3', '4'], answer: 0, exp: 'range(1, 4)는 1, 2, 3을 생성하므로 합은 6입니다.' },
+                    { id: 2, type: 'mc', question: '반복문을 즉시 완전 중단하고 빠져나오는 키워드는?', options: ['stop', 'continue', 'exit', 'break'], answer: 3, exp: 'break 키워드가 루프를 탈출합니다.' },
+                    { id: 3, type: 'code', question: 'count = 0\nwhile count < 3:\n    count += 1\nprint(count) 의 결과는?', options: ['2', '3', '4', '무한루프'], answer: 1, exp: 'count가 3이 되는 순간 while 조건이 거짓이 되어 3이 출력됩니다.' },
+                    { id: 4, type: 'tf', question: 'for 루프가 break로 종료되어도 루프의 else 블록은 실행된다.', answer: false, exp: 'break를 만나면 루프의 else 블록은 실행되지 않고 스킵됩니다.' },
+                    { id: 5, type: 'code', question: 'for i in range(5):\n    if i == 2: continue\n    print(i, end="") 의 결과는?', options: ['01234', '0134', '01', '2'], answer: 1, exp: 'i가 2일 때 continue로 출력을 건너뛰므로 0134입니다.' },
+                    { id: 6, type: 'mc', question: 'range(5)가 생성하는 수의 시퀀스는?', options: ['1, 2, 3, 4, 5', '0, 1, 2, 3, 4', '0, 1, 2, 3, 4, 5', '1, 2, 3, 4'], answer: 1, exp: 'range(stop)은 0부터 stop-1(4)까지 생성합니다.' },
+                    { id: 7, type: 'tf', question: 'pass 키워드는 아무 동작도 하지 않는 빈 껍데기 구문이다.', answer: true, exp: 'pass는 문법적 구조만 맞추는 널(Null) 연산자입니다.' },
+                    { id: 8, type: 'code', question: 'x = 10\nif x > 5:\n    print("A")\nelif x > 8:\n    print("B")\nelse:\n    print("C")', options: ['A', 'B', 'A와 B', 'C'], answer: 0, exp: '첫 조건 x > 5가 참이므로 "A"만 실행됩니다.' },
+                    { id: 9, type: 'mc', question: '두 시퀀스를 인덱스별로 묶어주는 내장 함수는?', options: ['bind()', 'concat()', 'zip()', 'combine()'], answer: 2, exp: 'zip() 함수가 대응 요소들을 묶어줍니다.' },
+                    { id: 10, type: 'code', question: 'res = [i * 2 for i in range(3)]\nprint(res) 의 결과는?', options: ['[0, 2, 4]', '[2, 4, 6]', '[0, 1, 2]', '[1, 2, 3]'], answer: 0, exp: '0*2, 1*2, 2*2로 [0, 2, 4] 리스트가 만들어집니다.' },
+                    { id: 11, type: 'tf', question: '파이썬은 블록 구분을 중괄호 대신 들여쓰기로 수행한다.', answer: true, exp: '들여쓰기가 강제되는 언어 특징을 갖습니다.' },
+                    { id: 12, type: 'code', question: 'for i in range(10, 0, -2):\n    print(i, end=" ")\n의 출력값은?', options: ['10 8 6 4 2', '10 8 6 4 2 0', '10 9 8 7 6', 'Error'], answer: 0, exp: '10부터 시작해 0 전(2)까지 -2씩 감소합니다.' },
+                    { id: 13, type: 'mc', question: '조건식 작성 문법 중 틀린 것은?', options: ['if x == 5:', 'if (x == 5):', 'if x == 5 then:', 'if not x:'], answer: 2, exp: '파이썬 조건문에는 then 키워드를 쓰지 않습니다.' },
+                    { id: 14, type: 'tf', question: 'while True: 구문은 탈출 조건이 없으면 무한 루프가 된다.', answer: true, exp: '조건식이 항상 참이기 때문입니다.' },
+                    { id: 15, type: 'code', question: 'a = [1, 2]\nwhile a:\n    a.pop()\nprint(len(a)) 의 결과는?', options: ['2', '1', '0', 'Error'], answer: 2, exp: 'a의 원소가 모두 제거되면 빈 리스트(Falsy)가 되어 0이 출력됩니다.' },
+                    { id: 16, type: 'code', question: 'for i in range(1, 1):\n    print("Hi")\n의 출력 횟수는?', options: ['0회', '1회', '무한', 'Error'], answer: 0, exp: 'range(1, 1)은 빈 범위이므로 반복이 실행되지 않습니다.' },
+                    { id: 17, type: 'tf', question: '파이썬 3.10 버전부터 match-case 패턴 매칭이 추가되었다.', answer: true, exp: 'switch-case와 유사한 match-case 구문이 추가되었습니다.' },
+                    { id: 18, type: 'mc', question: '인덱스와 요소를 동시에 반환해주는 순회 함수는?', options: ['index()', 'enumerate()', 'zip()', 'seq()'], answer: 1, exp: 'enumerate()가 (인덱스, 값) 튜플을 반환합니다.' },
+                    { id: 19, type: 'code', question: 'x = 0\nif x:\n    print("T")\nelse:\n    print("F")', options: ['T', 'F', 'Error', 'None'], answer: 1, exp: '0은 거짓으로 평가되어 else 블록이 실행됩니다.' },
+                    { id: 20, type: 'tf', question: '리스트 컴프리헨션 내에 if 필터링 조건을 추가할 수 있다.', answer: true, exp: '[x for x in list if 조건] 문법이 가능합니다.' }
+                ]
+            },
+            {
+                id: 'functions',
+                title: '5. 함수 및 라이브러리',
+                sub: 'Functions, Scope & Libraries',
+                easy: `• 함수(Function): 특정한 작업을 수행하는 코드 묶음 (def 키워드 정의)
+• 매개변수(Parameter): 함수에 전달받는 값을 정의하는 변수
+• 인수(Argument): 함수를 호출할 때 실제로 넘겨주는 값
+• return: 함수의 결과를 호출 부로 반환하고 함수를 종료함
+• 변수 범위 (Scope):
+  - 지역 변수(Local): 함수 내부에서만 유효
+  - 전역 변수(Global): 프로그램 전체에서 유효 (global 키워드로 수정 가능)
+• 람다 함수 (lambda): 한 줄로 작성하는 익명 함수`,
+                detail: `LEGB Rule (변수 탐색 순서):
+Local -> Enclosing -> Global -> Built-in 순서로 변수 이름을 탐색합니다.
+중첩 함수에서 상위 함수 변수를 수정하려면 nonlocal 키워드를 사용합니다.
+데이터 분석 필수 라이브러리: NumPy(배열 연산), Pandas(데이터프레임 전처리), Matplotlib(시각화).`,
+                code: `# 함수 및 람다 실습
+def calculate(a, b=10):
+    return a + b, a * b
 
-print(f"\\n총 합격자 수: {pass_count}명")`,
-  functions: `# [Topic 5] 함수 및 람다(Lambda)
-def calc_stats(*args):
-    total = sum(args)
-    avg = total / len(args)
-    return total, avg
+sum_val, mul_val = calculate(5)
+print(f"합: {sum_val}, 곱: {mul_val}")
 
-total, avg = calc_stats(90, 80, 100, 70)
-print(f"총점: {total}, 평균: {avg:.2f}")
+# 람다 함수 활용
+square = lambda x: x ** 2
+print("5의 제곱:", square(5))`,
+                sandboxInit: `def add_all(*args):
+    return sum(args)
 
-# 람다식과 filter
-even_nums = list(filter(lambda x: x % 2 == 0, range(1, 11)))
-print(f"1~10 중 짝수: {even_nums}")`,
-  files: `# [Topic 6] 파일 처리 예시 모의 시뮬레이터
-virtual_file = []
+print("합계:", add_all(1, 2, 3, 4, 5))`,
+                quizzes: [
+                    { id: 1, type: 'mc', question: '파이썬 함수를 정의할 때 사용하는 키워드는?', options: ['function', 'def', 'func', 'define'], answer: 1, exp: 'def 키워드로 함수를 생성합니다.' },
+                    { id: 2, type: 'code', question: 'def add(a, b=5):\n    return a + b\nprint(add(3)) 의 결과는?', options: ['3', '5', '8', 'Error'], answer: 2, exp: 'b의 기본값 5가 적용되어 3 + 5 = 8 이 됩니다.' },
+                    { id: 3, type: 'mc', question: '가변 위치 인자를 튜플로 받는 매개변수 표기법은?', options: ['**kwargs', '*args', '&args', '$args'], answer: 1, exp: '*args 표기법이 가변 인자를 튜플로 받아옵니다.' },
+                    { id: 4, type: 'code', question: 'f = lambda x, y: x * y\nprint(f(3, 4)) 의 결과는?', options: ['7', '12', '34', 'Error'], answer: 1, exp: '3 * 4 = 12 가 반환됩니다.' },
+                    { id: 5, type: 'tf', question: 'return 문이 없는 함수는 기본적으로 None을 반환한다.', answer: true, exp: '반환값이 명시되지 않은 함수는 None을 되돌려줍니다.' },
+                    { id: 6, type: 'mc', question: 'LEGB 규칙에서 G가 의미하는 변수 유효 범위는?', options: ['General', 'Global', 'Group', 'Gather'], answer: 1, exp: 'Global(전역) 범위를 의미합니다.' },
+                    { id: 7, type: 'code', question: 'x = 10\ndef foo():\n    x = 20\nfoo()\nprint(x) 의 결과는?', options: ['10', '20', 'None', 'Error'], answer: 0, exp: 'foo() 내부의 x는 지역 변수이므로 전역 변수 x = 10에 영향을 주지 않습니다.' },
+                    { id: 8, type: 'tf', question: '함수 안에서 전역 변수 값을 재할당하려면 global 선언이 필요하다.', answer: true, exp: 'global 변수명 선언이 있어야 전역 변수 수정이 가능합니다.' },
+                    { id: 9, type: 'mc', question: '가변 키워드 인자를 딕셔너리로 수집하는 표기법은?', options: ['*args', '**kwargs', 'dict_args', '&&kwargs'], answer: 1, exp: '**kwargs 표기법입니다.' },
+                    { id: 10, type: 'code', question: 'def calc(a, b):\n    return a+b, a*b\nres = calc(2, 3)\nprint(type(res)) 의 결과는?', options: ['<class "list">', '<class "tuple">', '<class "dict">', '<class "int">'], answer: 1, exp: '여러 값을 return 하면 하나의 Tuple로 반환됩니다.' },
+                    { id: 11, type: 'mc', question: '고성능 다차원 수치 배열 연산을 지원하는 핵심 라이브러리는?', options: ['Pandas', 'NumPy', 'Matplotlib', 'Requests'], answer: 1, exp: 'NumPy 라이브러리입니다.' },
+                    { id: 12, type: 'tf', question: '중첩 함수에서 바로 상위 외부 함수의 변수를 수정할 때 nonlocal을 사용한다.', answer: true, exp: 'nonlocal 키워드로 상위 Enclosing 변수를 지정합니다.' },
+                    { id: 13, type: 'code', question: 'sqr = list(map(lambda x: x**2, [1, 2, 3]))\nprint(sqr) 의 결과는?', options: ['[1, 4, 9]', '[1, 2, 3]', '14', '[1, 8, 27]'], answer: 0, exp: ' 각 원소의 제곱값인 [1, 4, 9]가 됩니다.' },
+                    { id: 14, type: 'mc', question: '2차원 표 형태(DataFrame) 데이터를 다루는 표준 라이브러리는?', options: ['NumPy', 'Pandas', 'Matplotlib', 'Seaborn'], answer: 1, exp: 'Pandas 라이브러리입니다.' },
+                    { id: 15, type: 'tf', question: '재귀 함수는 자기 자신을 재호출하는 구조의 함수이다.', answer: true, exp: '자기 자신을 호출하여 문제를 분할 해결합니다.' },
+                    { id: 16, type: 'code', question: 'def f(a, b, c):\n    return a + b * c\nprint(f(c=2, b=3, a=1)) 의 결과는?', options: ['7', '8', '9', 'Error'], answer: 0, exp: 'a=1, b=3, c=2가 대입되어 1 + 3 * 2 = 7 이 됩니다.' },
+                    { id: 17, type: 'mc', question: '파이썬 시각화 그래프 작성을 위한 대표 모듈은?', options: ['matplotlib.pyplot', 'numpy.random', 'pandas.data', 'sys.path'], answer: 0, exp: 'matplotlib.pyplot 모듈입니다.' },
+                    { id: 18, type: 'tf', question: '기본 인자(Default Parameter) 값으로 빈 리스트([])를 쓰는 것은 권장된다.', answer: false, exp: '가변 객체를 기본 인자로 지정하면 호출 간 상태가 공유되어 오류 원인이 됩니다.' },
+                    { id: 19, type: 'code', question: 'def func(*args):\n    return len(args)\nprint(func(1, 2, 3)) 의 결과는?', options: ['1', '3', '6', 'Error'], answer: 1, exp: '인자가 3개 넘어갔으므로 길이는 3입니다.' },
+                    { id: 20, type: 'tf', question: '파이썬의 함수는 1급 객체(First-class Object)여서 변수에 할당할 수 있다.', answer: true, exp: '함수를 변수 할당, 인자 전달, 반환값으로 자유롭게 사용 가능합니다.' }
+                ]
+            },
+            {
+                id: 'files',
+                title: '6. 파일 처리',
+                sub: 'File I/O & Exceptions',
+                easy: `• 파일 처리 기본 순서: open(파일열기) -> 읽기/쓰기 작업 -> close(파일닫기)
+• 파일 열기 모드:
+  - 'r': 읽기 모드 (파일이 없으면 오류 발생)
+  - 'w': 쓰기 모드 (새로 작성하며 기존 내용을 덮어씀)
+  - 'a': 추가 모드 (기존 파일의 끝에 이어 씀)
+• 주요 메서드:
+  - f.read(): 파일 전체를 하나의 문자열로 읽음
+  - f.readline(): 한 줄씩 문자열로 읽음
+  - f.readlines(): 전체 줄을 나누어 리스트로 반환
+  - f.write("내용"): 파일에 문자열 기록
+• with open(...) as f: 블록 탈출 시 파일이 자동으로 close() 됨`,
+                detail: `예외 처리 (try - except - else - finally):
+- try: 예외가 일어날 수 있는 코드 실행 block
+- except: 예외 발생 시 처리되는 block
+- else: 예외가 발생하지 않았을 때만 실행되는 block
+- finally: 예외 발생 여부와 상관없이 무조건 마지막에 실행되는 자원 해제 block`,
+                code: `# 파일 입출력 및 예외 처리 예시
+try:
+    with open("sample.txt", "w", encoding="utf-8") as f:
+        f.write("파이썬 파일 처리 연습\\n두 번째 줄")
+    
+    with open("sample.txt", "r", encoding="utf-8") as f:
+        print("=== 파일 내용 ===")
+        print(f.read())
+except Exception as e:
+    print("파일 오류:", e)`,
+                sandboxInit: `try:
+    x = 10 / 0
+except ZeroDivisionError:
+    print("0으로 나눌 수 없습니다!")
+finally:
+    print("예외 처리 완료.")`,
+                quizzes: [
+                    { id: 1, type: 'mc', question: '기존 파일 내용을 유지하고 끝에 덧붙일 때 사용하는 open 모드는?', options: ['"r"', '"w"', '"a"', '"x"'], answer: 2, exp: '"a" (append) 모드는 끝에 내용을 이어 씁니다.' },
+                    { id: 2, type: 'tf', question: 'with open(...) 구문을 사용하면 close()를 자동 처리해준다.', answer: true, exp: 'with 문은 구문 종료 시 컨텍스트 매니저를 통해 자동 해제합니다.' },
+                    { id: 3, type: 'mc', question: '파일 전체 내용을 줄 단위로 나누어 리스트로 반환하는 메서드는?', options: ['read()', 'readline()', 'readlines()', 'readall()'], answer: 2, exp: 'readlines()가 각 줄을 요소로 갖는 리스트를 반환합니다.' },
+                    { id: 4, type: 'code', question: 'f.readline()이 반환하는 자료형은?', options: ['str', 'list', 'dict', 'tuple'], answer: 0, exp: '단일 라인을 문자열(str)로 읽어옵니다.' },
+                    { id: 5, type: 'mc', question: '이진(바이너리) 파일을 다룰 때 사용하는 모드 플래그는?', options: ['t', 'b', 'bin', 'raw'], answer: 1, exp: '"rb", "wb" 처럼 "b" 플래그를 붙여 사용합니다.' },
+                    { id: 6, type: 'tf', question: '"r" 모드로 없는 파일을 열려고 하면 FileNotFoundError가 발생한다.', answer: true, exp: '읽기 모드는 대상 파일이 필수 존재해야 합니다.' },
+                    { id: 7, type: 'mc', question: '예외 발생 여부와 상관없이 무조건 마지막에 실행되는 블록은?', options: ['except', 'else', 'finally', 'always'], answer: 2, exp: 'finally 블록은 항상 마지막에 실행됩니다.' },
+                    { id: 8, type: 'tf', question: '"w" 모드로 기존 파일을 열면 기존 내용은 지워진다.', answer: true, exp: '쓰기 모드는 덮어쓰기(Truncate) 방식으로 열립니다.' },
+                    { id: 9, type: 'code', question: 'try:\n    x = 10 / 0\nexcept ZeroDivisionError:\n    print("Z", end="")\nprint("D")', options: ['ZD', 'ED', 'ZED', 'Error'], answer: 0, exp: 'except의 "Z"와 마지막 print의 "D"가 결합되어 ZD가 됩니다.' },
+                    { id: 10, type: 'mc', question: '파일이 존재할 경우 에러를 일으켜 생성을 방지하는 모드는?', options: ['"r"', '"w"', '"x"', '"a"'], answer: 2, exp: '"x" (Exclusive creation) 모드입니다.' },
+                    { id: 11, type: 'tf', question: 'try-except의 else 블록은 예외가 없을 때만 실행된다.', answer: true, exp: '예외 없이 정상 수행되었을 때 실행됩니다.' },
+                    { id: 12, type: 'mc', question: '한글 텍스트 인코딩 지정을 위한 open 인자는?', options: ['code="utf-8"', 'encoding="utf-8"', 'format="utf-8"', 'type="utf-8"'], answer: 1, exp: 'encoding="utf-8" 인자를 사용합니다.' },
+                    { id: 13, type: 'code', question: 'try:\n    a = int("abc")\nexcept ValueError:\n    print("ERR") 의 결과는?', options: ['abc', 'ValueError', 'ERR', 'None'], answer: 2, exp: '형변환 오류로 인해 ValueError 핸들러가 실행되어 "ERR"이 됩니다.' },
+                    { id: 14, type: 'tf', question: 'f.seek(0)은 파일 포인터를 맨 처음 위치로 되돌린다.', answer: true, exp: 'seek(0)은 읽기/쓰기 위치를 0번 바이트로 이동합니다.' },
+                    { id: 15, type: 'mc', question: '직접 의도적으로 예외를 발생시킬 때 사용하는 키워드는?', options: ['throw', 'raise', 'error', 'dispatch'], answer: 1, exp: 'raise 키워드로 예외를 발생시킵니다.' },
+                    { id: 16, type: 'code', question: 'with open("a.txt", "w") as f:\n    res = f.write("12345")\nprint(res) 의 결과는?', options: ['True', '5', '12345', 'None'], answer: 1, exp: 'write()는 기록한 문자 수(5)를 반환합니다.' },
+                    { id: 17, type: 'tf', question: 'f.tell() 메서드는 현재 파일 포인터의 위치를 반환한다.', answer: true, exp: 'tell()은 위치 인덱스를 되돌려줍니다.' },
+                    { id: 18, type: 'code', question: 'try:\n    assert 1 == 2\nexcept AssertionError:\n    print("FAIL") 의 결과는?', options: ['FAIL', 'True', 'False', 'Pass'], answer: 0, exp: 'assert 조건이 거짓이므로 AssertionError가 발생하여 FAIL이 출력됩니다.' },
+                    { id: 19, type: 'mc', question: 'writelines() 메서드가 전달받는 인자의 자료형은?', options: ['정수', '문자열 리스트', '실수', '딕셔너리 키'], answer: 1, exp: '문자열 요소들을 담은 이터러블(리스트 등)을 받아 파일에 씁니다.' },
+                    { id: 20, type: 'tf', question: 'open("file.txt")의 기본 열기 모드는 "r"(읽기)이다.', answer: true, exp: '모드를 생략하면 기본값으로 "r" 모드가 적용됩니다.' }
+                ]
+            }
+        ];
 
-def write_line(text):
-    virtual_file.append(text + "\\n")
+        // ===== Pyodide: 브라우저에서 실제 CPython 실행 =====
+        const PYODIDE_BASE = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+        let pyodideInstance = null;
+        let pyodidePromise = null;
 
-def read_all():
-    return "".join(virtual_file)
+        const SANDBOX_RUNNER = String.raw`
+import sys, io, json, traceback
 
-write_line("Hello Python File System!")
-write_line("Created by HDA Copyright 2026.")
+def _sandbox_run(code):
+    buf = io.StringIO()
+    old_out, old_err = sys.stdout, sys.stderr
+    sys.stdout = sys.stderr = buf
+    err = ""
+    try:
+        exec(compile(code, "main.py", "exec"), {"__name__": "__main__"})
+    except BaseException:
+        etype, e, tb = sys.exc_info()
+        tb = tb.tb_next if tb else None  # 내부 실행 프레임 숨기기
+        err = "".join(traceback.format_exception(etype, e, tb)).rstrip()
+    finally:
+        sys.stdout, sys.stderr = old_out, old_err
+    return json.dumps({"out": buf.getvalue(), "err": err})
+`;
 
-print("--- 파일 내용 읽기 결과 ---")
-print(read_all())`
-};
-
-export default function App() {
-  // State Management
-  const [activeTab, setActiveTab] = useState('concept'); // 'concept' | 'quiz' | 'sandbox'
-  const [currentTopicId, setCurrentTopicId] = useState('variables');
-  
-  // Quiz System States
-  const [quizFilter, setQuizFilter] = useState('all'); // 'all' | 'mc' | 'tf' | 'code'
-  const [userAnswers, setUserAnswers] = useState({}); // { [quizId]: selectedAnswer }
-  const [showExplanation, setShowExplanation] = useState({});
-  const [quizTimer, setQuizTimer] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-
-  // Code Sandbox States
-  const [sandboxCode, setSandboxCode] = useState(CODE_TEMPLATES.variables);
-  const [sandboxOutput, setSandboxOutput] = useState('');
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [copiedCode, setCopiedCode] = useState(false);
-
-  // Active Topic object
-  const currentTopic = useMemo(() => {
-    return TOPICS_DATA.find(t => t.id === currentTopicId) || TOPICS_DATA[0];
-  }, [currentTopicId]);
-
-  // Filtered Quizzes
-  const filteredQuizzes = useMemo(() => {
-    if (quizFilter === 'all') return currentTopic.quizzes;
-    return currentTopic.quizzes.filter(q => q.type === quizFilter);
-  }, [currentTopic, quizFilter]);
-
-  // Change Topic Handler
-  const handleSelectTopic = (topicId) => {
-    setCurrentTopicId(topicId);
-    setUserAnswers({});
-    setShowExplanation({});
-    setQuizSubmitted(false);
-    setQuizTimer(0);
-    setIsTimerRunning(false);
-    setSandboxCode(CODE_TEMPLATES[topicId] || '# 코드를 입력하세요.');
-    setSandboxOutput('');
-  };
-
-  // Timer Effect
-  useEffect(() => {
-    let interval = null;
-    if (isTimerRunning && !quizSubmitted) {
-      interval = setInterval(() => {
-        setQuizTimer(prev => prev + 1);
-      }, 1000);
-    } else {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [isTimerRunning, quizSubmitted]);
-
-  // Answer Quiz Handler
-  const handleSelectAnswer = (quizId, optionIndex) => {
-    if (quizSubmitted) return;
-    if (!isTimerRunning) setIsTimerRunning(true);
-    setUserAnswers(prev => ({
-      ...prev,
-      [quizId]: optionIndex
-    }));
-  };
-
-  // Submit Quiz Session
-  const handleSubmitQuiz = () => {
-    setQuizSubmitted(true);
-    setIsTimerRunning(false);
-  };
-
-  // Reset Current Quiz
-  const handleResetQuiz = () => {
-    setUserAnswers({});
-    setShowExplanation({});
-    setQuizSubmitted(false);
-    setQuizTimer(0);
-    setIsTimerRunning(false);
-  };
-
-  // Execute Simulated Python Code
-  const handleRunCode = () => {
-    setIsExecuting(true);
-    setSandboxOutput('⏳ Python 인터프리터 바이트코드 실행 중...');
-
-    setTimeout(() => {
-      try {
-        let logs = [];
-        const customConsoleLog = (...args) => {
-          logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+        const getPyodide = () => {
+            if (pyodidePromise) return pyodidePromise;
+            pyodidePromise = new Promise((resolve, reject) => {
+                const boot = async () => {
+                    try {
+                        const py = await window.loadPyodide({ indexURL: PYODIDE_BASE });
+                        py.runPython(SANDBOX_RUNNER);
+                        pyodideInstance = py;
+                        resolve(py);
+                    } catch (e) { reject(e); }
+                };
+                if (window.loadPyodide) { boot(); return; }
+                const sc = document.createElement('script');
+                sc.src = PYODIDE_BASE + 'pyodide.js';
+                sc.onload = boot;
+                sc.onerror = () => reject(new Error('Pyodide 스크립트를 불러올 수 없습니다.'));
+                document.head.appendChild(sc);
+            });
+            return pyodidePromise;
         };
 
-        const formattedCode = sandboxCode
-          .replace(/print\((.*?)\)/g, (match, p1) => `customConsoleLog(${p1})`)
-          .replace(/#.*/g, '')
-          .replace(/f"(.*?)"/g, (m, p1) => {
-            return '`' + p1.replace(/\{([^}]+)\}/g, '${$1}') + '`';
-          });
+        function App() {
+            const [activeTab, setActiveTab] = useState('concept'); // 'concept' | 'quiz' | 'sandbox'
+            const [currentTopicId, setCurrentTopicId] = useState('variables');
+            const [quizFilter, setQuizFilter] = useState('all');
+            const [userAnswers, setUserAnswers] = useState({});
+            const [quizSubmitted, setQuizSubmitted] = useState(false);
+            const [showExp, setShowExp] = useState({});
+            const [timer, setTimer] = useState(0);
+            const [isTimerRunning, setIsTimerRunning] = useState(false);
 
-        const runFunc = new Function('customConsoleLog', formattedCode);
-        runFunc(customConsoleLog);
+            const currentTopic = useMemo(() => {
+                return TOPICS_DATA.find(t => t.id === currentTopicId) || TOPICS_DATA[0];
+            }, [currentTopicId]);
 
-        if (logs.length > 0) {
-          setSandboxOutput(logs.join('\n'));
-        } else {
-          setSandboxOutput('✨ 코드가 오류 없이 성공적으로 실행되었습니다. (출력 내용 없음)');
-        }
-      } catch (err) {
-        setSandboxOutput(`❌ SyntaxError / RuntimeError: ${err.message}\n💡 파이썬 코드 문법 및 인덴테이션을 확인하세요.`);
-      } finally {
-        setIsExecuting(false);
-      }
-    }, 600);
-  };
+            const [sandboxCode, setSandboxCode] = useState(currentTopic.sandboxInit);
+            const [sandboxOutput, setSandboxOutput] = useState('');
+            const [isExecuting, setIsExecuting] = useState(false);
 
-  // Copy Code to Clipboard
-  const handleCopyCode = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
+            useEffect(() => {
+                setSandboxCode(currentTopic.sandboxInit);
+                setSandboxOutput('');
+                setUserAnswers({});
+                setQuizSubmitted(false);
+                setShowExp({});
+                setTimer(0);
+                setIsTimerRunning(false);
+            }, [currentTopicId]);
 
-  // Format Time (Seconds -> MM:SS)
-  const formatTime = (secs) => {
-    const m = Math.floor(secs / 60).toString().padStart(2, '0');
-    const s = (secs % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
+            useEffect(() => {
+                let interval = null;
+                if (isTimerRunning && !quizSubmitted) {
+                    interval = setInterval(() => setTimer(t => t + 1), 1000);
+                } else {
+                    clearInterval(interval);
+                }
+                return () => clearInterval(interval);
+            }, [isTimerRunning, quizSubmitted]);
 
-  // Quiz Score Calculation
-  const calculateScore = () => {
-    let correct = 0;
-    currentTopic.quizzes.forEach(q => {
-      if (userAnswers[q.id] === q.answer) correct += 1;
-    });
-    return correct;
-  };
+            const handleSelectAnswer = (qId, ansIdx) => {
+                if (quizSubmitted) return;
+                if (!isTimerRunning) setIsTimerRunning(true);
+                setUserAnswers(prev => ({ ...prev, [qId]: ansIdx }));
+            };
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col selection:bg-cyan-500 selection:text-slate-900">
-      
-      {/* GLOBAL HEADER / NAVIGATION */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-cyan-500/20 px-4 lg:px-8 py-3 flex items-center justify-between shadow-lg shadow-cyan-950/30">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-gradient-to-tr from-cyan-500 to-purple-600 rounded-xl shadow-md shadow-cyan-500/20">
-            <Sparkles className="w-6 h-6 text-slate-900 stroke-[2.5]" />
-          </div>
-          <div>
-            <h1 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-sky-300 to-purple-400 bg-clip-text text-transparent">
-              PYTHON MASTERY HUB
-            </h1>
-            <p className="text-xs text-slate-400">교과서 기초 개념부터 실전 퀴즈까지</p>
-          </div>
-        </div>
+            const calculateScore = () => {
+                let cnt = 0;
+                currentTopic.quizzes.forEach(q => {
+                    if (userAnswers[q.id] === q.answer) cnt++;
+                });
+                return cnt;
+            };
 
-        {/* TABS SELECTOR */}
-        <div className="flex items-center bg-slate-950/80 border border-slate-800 rounded-full p-1">
-          <button
-            onClick={() => setActiveTab('concept')}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 ${
-              activeTab === 'concept'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 shadow-md shadow-cyan-500/30'
-                : 'text-slate-400 hover:text-cyan-400'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            <span>기초 및 심화 개념</span>
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('quiz')}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 ${
-              activeTab === 'quiz'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-slate-950 shadow-md shadow-purple-500/30'
-                : 'text-slate-400 hover:text-purple-400'
-            }`}
-          >
-            <HelpCircle className="w-4 h-4" />
-            <span className="flex items-center gap-1.5">
-              퀴즈 테스트
-              <span className="bg-slate-900 text-purple-300 px-1.5 py-0.5 rounded-full text-[10px] border border-purple-500/40">20 Qs</span>
-            </span>
-          </button>
+            // 샌드박스 에디터: Tab 들여쓰기 / Shift+Tab 내어쓰기 / Enter 자동 들여쓰기
+            const handleEditorKeyDown = (e) => {
+                const TAB = '    ';
+                const ta = e.target;
+                const { selectionStart: start, selectionEnd: end, value } = ta;
 
-          <button
-            onClick={() => setActiveTab('sandbox')}
-            className={`flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 ${
-              activeTab === 'sandbox'
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 shadow-md shadow-emerald-500/30'
-                : 'text-slate-400 hover:text-emerald-400'
-            }`}
-          >
-            <Terminal className="w-4 h-4" />
-            <span>코드 샌드박스</span>
-          </button>
-        </div>
-      </header>
+                const apply = (newValue, selStart, selEnd) => {
+                    setSandboxCode(newValue);
+                    requestAnimationFrame(() => {
+                        ta.selectionStart = selStart;
+                        ta.selectionEnd = selEnd;
+                    });
+                };
 
-      {/* MAIN CONTAINER WITH SIDEBAR */}
-      <div className="flex-1 flex flex-col md:flex-row max-w-7xl w-full mx-auto p-4 md:p-6 gap-6">
-        
-        {/* TOPIC NAVIGATION SIDEBAR */}
-        <aside className="w-full md:w-72 shrink-0 space-y-3">
-          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 backdrop-blur-md">
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <BookMarked className="w-4 h-4 text-cyan-400" />
-              학습 토픽 단원 (6개)
-            </h2>
-            <nav className="space-y-2">
-              {TOPICS_DATA.map((t) => {
-                const IconComponent = t.icon;
-                const isSelected = t.id === currentTopicId;
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => handleSelectTopic(t.id)}
-                    className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${
-                      isSelected
-                        ? `bg-slate-800/90 border-${t.accentColor}-500/50 text-white shadow-lg shadow-${t.accentColor}-950/40`
-                        : 'bg-slate-950/40 border-slate-800/80 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={`p-2 rounded-lg bg-slate-900 border ${isSelected ? `border-${t.accentColor}-400 text-${t.accentColor}-400` : 'border-slate-800 text-slate-500'}`}>
-                        <IconComponent className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className={`text-xs md:text-sm font-bold ${isSelected ? 'text-cyan-300' : 'text-slate-200'}`}>
-                          {t.title}
-                        </p>
-                        <p className="text-[11px] text-slate-500 font-mono">{t.sub}</p>
-                      </div>
-                    </div>
-                    <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'rotate-90 text-cyan-400' : 'text-slate-600 group-hover:translate-x-0.5'}`} />
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+                    const multiLine = value.slice(start, end).includes('\n');
 
-          {/* QUICK TOPIC METRICS CARD */}
-          <div className="bg-gradient-to-br from-slate-900/80 to-slate-950 border border-slate-800/80 rounded-2xl p-4 text-xs space-y-2">
-            <div className="flex justify-between items-center text-slate-400">
-              <span>현재 선택된 토픽</span>
-              <span className="font-mono text-cyan-400 font-bold">{currentTopic.title.split(' ')[1]}</span>
-            </div>
-            <div className="flex justify-between items-center text-slate-400">
-              <span>총 퀴즈 문제 수</span>
-              <span className="font-mono text-purple-400 font-bold">20 문제</span>
-            </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
-              <div 
-                className="bg-gradient-to-r from-cyan-400 to-purple-500 h-full rounded-full transition-all duration-300"
-                style={{ width: `${((userAnswers ? Object.keys(userAnswers).length : 0) / 20) * 100}%` }}
-              ></div>
-            </div>
-          </div>
-        </aside>
+                    if (!e.shiftKey && !multiLine) {
+                        apply(value.slice(0, start) + TAB + value.slice(end), start + TAB.length, start + TAB.length);
+                        return;
+                    }
 
-        {/* MAIN DISPLAY AREA */}
-        <main className="flex-1 min-w-0">
-          
-          {/* TAB 1: CONCEPT OVERVIEW & DETAILED EXPLANATION */}
-          {activeTab === 'concept' && (
-            <div className="space-y-6">
-              {/* TOPIC BANNER */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -z-0"></div>
-                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 mb-2">
-                      Textbook & Advanced Concepts
-                    </span>
-                    <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-                      {currentTopic.title}
-                    </h2>
-                    <p className="text-slate-400 text-sm mt-1">{currentTopic.sub}</p>
-                  </div>
+                    // 여러 줄 선택 또는 Shift+Tab: 줄 단위 처리
+                    const block = value.slice(lineStart, end);
+                    const lines = block.split('\n');
+                    let firstDelta = 0, totalDelta = 0;
+                    const newLines = lines.map((line, i) => {
+                        if (!e.shiftKey) {
+                            if (i === 0) firstDelta = TAB.length;
+                            totalDelta += TAB.length;
+                            return TAB + line;
+                        }
+                        const m = line.match(/^( {1,4}|\t)/);
+                        const removed = m ? m[0].length : 0;
+                        if (i === 0) firstDelta = -removed;
+                        totalDelta -= removed;
+                        return line.slice(removed);
+                    });
+                    apply(
+                        value.slice(0, lineStart) + newLines.join('\n') + value.slice(end),
+                        Math.max(lineStart, start + firstDelta),
+                        end + totalDelta
+                    );
+                } else if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                    e.preventDefault();
+                    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+                    const currentLine = value.slice(lineStart, start);
+                    let indent = (currentLine.match(/^\s*/) || [''])[0];
+                    // 콜론(:)으로 끝나면 한 단계 더 들여쓰기 (파이썬)
+                    if (currentLine.trimEnd().endsWith(':')) indent += TAB;
+                    const insert = '\n' + indent;
+                    apply(value.slice(0, start) + insert + value.slice(end), start + insert.length, start + insert.length);
+                }
+            };
 
-                  <button
-                    onClick={() => setActiveTab('quiz')}
-                    className="self-start sm:self-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 text-slate-950 font-bold text-xs md:text-sm hover:brightness-110 shadow-lg shadow-purple-500/20 flex items-center space-x-2 transition-all"
-                  >
-                    <span>이 개념 퀴즈 풀기 (20문항)</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+            const handleRunCode = async () => {
+                if (isExecuting) return;
+                setIsExecuting(true);
+                setSandboxOutput(pyodideInstance
+                    ? "⏳ 실행 중..."
+                    : "⏳ Python 엔진 로딩 중... (최초 1회, 수 초 걸릴 수 있어요)");
 
-              {/* CONCEPT SECTIONS */}
-              {currentTopic.concepts.map((concept, index) => (
-                <div key={index} className="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-sm space-y-4 hover:border-slate-700 transition-colors">
-                  <h3 className="text-lg font-bold text-cyan-300 flex items-center gap-2">
-                    {concept.title.includes('쉬운') ? (
-                      <BookCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-                    ) : (
-                      <Lightbulb className="w-5 h-5 text-amber-400 shrink-0" />
-                    )}
-                    {concept.title}
-                  </h3>
-                  
-                  <div className="text-slate-300 text-sm leading-relaxed whitespace-pre-line space-y-2 font-normal">
-                    {concept.content}
-                  </div>
+                try {
+                    const py = await getPyodide();
+                    const raw = py.globals.get('_sandbox_run')(sandboxCode);
+                    const { out, err } = JSON.parse(raw);
 
-                  {concept.code && (
-                    <div className="mt-4 bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
-                      <div className="bg-slate-900 px-4 py-2 border-b border-slate-800 flex justify-between items-center text-xs font-mono text-slate-400">
-                        <span className="flex items-center gap-2">
-                          <Code className="w-3.5 h-3.5 text-cyan-400" /> python_example.py
-                        </span>
-                        <button
-                          onClick={() => handleCopyCode(concept.code)}
-                          className="hover:text-white flex items-center gap-1 transition-colors"
-                        >
-                          {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                          <span>{copiedCode ? '복사됨' : '복사'}</span>
-                        </button>
-                      </div>
-                      <pre className="p-4 text-xs md:text-sm font-mono text-cyan-100 overflow-x-auto leading-relaxed">
-                        <code>{concept.code}</code>
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+                    if (err) {
+                        setSandboxOutput((out ? out + '\n' : '') + '❌ ' + err);
+                    } else if (out.length > 0) {
+                        setSandboxOutput(out);
+                    } else {
+                        setSandboxOutput("✨ 코드가 문제 없이 실행되었습니다. (출력 내용 없음)");
+                    }
+                } catch (e) {
+                    pyodidePromise = null; // 로딩 실패 시 다음 실행에서 재시도
+                    setSandboxOutput(`❌ Python 엔진을 불러오지 못했습니다.\n인터넷 연결을 확인한 뒤 다시 실행해 주세요.\n(${e && e.message ? e.message : e})`);
+                } finally {
+                    setIsExecuting(false);
+                }
+            };
 
-          {/* TAB 2: QUIZ SYSTEM */}
-          {activeTab === 'quiz' && (
-            <div className="space-y-6">
-              
-              {/* QUIZ HEADER BAR */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="flex items-center space-x-3 w-full md:w-auto">
-                  <div className="p-2.5 bg-purple-500/10 border border-purple-500/20 rounded-xl text-purple-400">
-                    <Award className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-white">
-                      {currentTopic.title} 퀴즈
-                    </h3>
-                    <p className="text-xs text-slate-400">
-                      총 20문항 중 <span className="text-purple-300 font-bold">{Object.keys(userAnswers).length}</span>개 답변 완료
-                    </p>
-                  </div>
-                </div>
+            const filteredQuizzes = useMemo(() => {
+                if (quizFilter === 'all') return currentTopic.quizzes;
+                return currentTopic.quizzes.filter(q => q.type === quizFilter);
+            }, [currentTopic, quizFilter]);
 
-                {/* TIMER & CONTROLS */}
-                <div className="flex items-center space-x-3 w-full md:w-auto justify-end">
-                  <div className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-cyan-400">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{formatTime(quizTimer)}</span>
-                  </div>
-
-                  <button
-                    onClick={handleResetQuiz}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium flex items-center space-x-1 transition-colors"
-                    title="퀴즈 초기화"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </button>
-
-                  {!quizSubmitted ? (
-                    <button
-                      onClick={handleSubmitQuiz}
-                      disabled={Object.keys(userAnswers).length === 0}
-                      className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-pink-600 text-slate-950 text-xs font-bold hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-purple-500/20 transition-all"
-                    >
-                      결과 제출하기
-                    </button>
-                  ) : (
-                    <span className="px-3 py-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-bold rounded-lg flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> 제출 완료
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* QUIZ SCORE SUMMARY BANNER */}
-              {quizSubmitted && (
-                <div className="bg-gradient-to-r from-purple-950/80 via-slate-900 to-slate-950 border border-purple-500/40 rounded-2xl p-6 text-center space-y-3 shadow-2xl">
-                  <div className="inline-flex p-3 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 mb-1">
-                    <Zap className="w-8 h-8 animate-bounce" />
-                  </div>
-                  <h4 className="text-xl font-black text-white">퀴즈 테스트 결과 레포트</h4>
-                  <div className="flex justify-center items-center space-x-6 text-sm py-2">
+            return (
+                <div className="min-h-screen flex flex-col justify-between">
                     <div>
-                      <p className="text-slate-400 text-xs">최종 점수</p>
-                      <p className="text-2xl font-black text-cyan-400">{calculateScore()} / 20 점</p>
-                    </div>
-                    <div className="h-8 w-px bg-slate-800"></div>
-                    <div>
-                      <p className="text-slate-400 text-xs">정답률</p>
-                      <p className="text-2xl font-black text-emerald-400">{Math.round((calculateScore() / 20) * 100)}%</p>
-                    </div>
-                    <div className="h-8 w-px bg-slate-800"></div>
-                    <div>
-                      <p className="text-slate-400 text-xs">소요 시간</p>
-                      <p className="text-2xl font-black text-purple-400">{formatTime(quizTimer)}</p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-slate-400">
-                    아래 문제 리스트에서 해설을 다시 복습해보세요!
-                  </p>
-                </div>
-              )}
+                        {/* HEADER */}
+                        <header className="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-cyan-500/20 px-4 md:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg shadow-cyan-950/20">
+                            <div className="flex items-center space-x-3">
+                                <div className="p-2 bg-gradient-to-tr from-cyan-500 to-indigo-600 rounded-xl shadow-md shadow-cyan-500/20 font-black text-slate-950 text-xl">
+                                    Py
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-sky-300 to-purple-400 bg-clip-text text-transparent">
+                                        PYTHON MASTERY HUB
+                                    </h1>
+                                    <p className="text-xs text-slate-400">파이썬 교과 기초 개념 & 120제 풀이 마스터</p>
+                                </div>
+                            </div>
 
-              {/* QUIZ FILTER TABS */}
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                <span className="text-xs font-bold text-slate-400 mr-2">유형 필터:</span>
-                {[
-                  { key: 'all', label: '전체 (20)' },
-                  { key: 'mc', label: '객관식' },
-                  { key: 'tf', label: 'True/False' },
-                  { key: 'code', label: '코드 실행 예측' }
-                ].map(filter => (
-                  <button
-                    key={filter.key}
-                    onClick={() => setQuizFilter(filter.key)}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                      quizFilter === filter.key
-                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
-                        : 'text-slate-400 hover:text-slate-200 bg-slate-950/40'
-                    }`}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
+                            {/* TABS */}
+                            <div className="flex items-center bg-slate-950/80 border border-slate-800 rounded-full p-1 z-10">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('concept')}
+                                    className={`cursor-pointer px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 select-none ${activeTab === 'concept' ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 shadow-md shadow-cyan-500/20' : 'text-slate-400 hover:text-cyan-400'}`}
+                                >
+                                    개념 노트
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('quiz')}
+                                    className={`cursor-pointer px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 select-none ${activeTab === 'quiz' ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-slate-950 shadow-md shadow-purple-500/20' : 'text-slate-400 hover:text-purple-400'}`}
+                                >
+                                    퀴즈 테스트 (20Q)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('sandbox')}
+                                    className={`cursor-pointer px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 select-none ${activeTab === 'sandbox' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-emerald-400'}`}
+                                >
+                                    실습 샌드박스
+                                </button>
+                            </div>
+                        </header>
 
-              {/* QUESTIONS LIST */}
-              <div className="space-y-4">
-                {filteredQuizzes.map((quiz) => {
-                  const isAnswered = userAnswers[quiz.id] !== undefined;
-                  const isCorrect = quizSubmitted && userAnswers[quiz.id] === quiz.answer;
-                  const isWrong = quizSubmitted && isAnswered && userAnswers[quiz.id] !== quiz.answer;
+                        {/* MAIN LAYOUT */}
+                        <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 flex flex-col md:flex-row gap-6">
+                            
+                            {/* TOPIC SIDEBAR */}
+                            <aside className="w-full md:w-64 shrink-0 space-y-3">
+                                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 backdrop-blur-md">
+                                    <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                                        학습 단원 (6개)
+                                    </h2>
+                                    <nav className="space-y-1.5">
+                                        {TOPICS_DATA.map((t) => {
+                                            const isSelected = t.id === currentTopicId;
+                                            return (
+                                                <button
+                                                    key={t.id}
+                                                    type="button"
+                                                    onClick={() => setCurrentTopicId(t.id)}
+                                                    className={`w-full text-left p-3 rounded-xl border text-xs md:text-sm font-bold transition cursor-pointer flex items-center justify-between ${
+                                                        isSelected
+                                                            ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-300 shadow-md shadow-cyan-950/40'
+                                                            : 'bg-slate-950/40 border-slate-800/80 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'
+                                                    }`}
+                                                >
+                                                    <span>{t.title}</span>
+                                                    <span className="text-[10px] font-mono text-slate-500">20Q</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </nav>
+                                </div>
+                            </aside>
 
-                  return (
-                    <div
-                      key={quiz.id}
-                      className={`bg-slate-900/60 border rounded-2xl p-5 transition-all ${
-                        quizSubmitted
-                          ? isCorrect
-                            ? 'border-emerald-500/40 bg-emerald-950/10'
-                            : isWrong
-                            ? 'border-rose-500/40 bg-rose-950/10'
-                            : 'border-slate-800'
-                          : isAnswered
-                          ? 'border-purple-500/30'
-                          : 'border-slate-800/80'
-                      }`}
-                    >
-                      {/* QUESTION HEADER */}
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center space-x-2">
-                          <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-xs font-mono font-bold">
-                            Q{quiz.id}
-                          </span>
-                          <span className="text-[11px] px-2 py-0.5 rounded bg-slate-950 text-purple-400 border border-purple-500/20 uppercase font-mono">
-                            {quiz.type}
-                          </span>
-                        </div>
+                            {/* MAIN CONTENT AREA */}
+                            <main className="flex-1 min-w-0">
+                                
+                                {/* TAB 1: CONCEPTS */}
+                                {activeTab === 'concept' && (
+                                    <div className="space-y-6">
+                                        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                                            <span className="inline-block px-2.5 py-1 rounded-md text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 mb-2">
+                                                {currentTopic.sub}
+                                            </span>
+                                            <h2 className="text-2xl md:text-3xl font-black text-white">{currentTopic.title}</h2>
+                                        </div>
 
-                        {quizSubmitted && (
-                          <div>
-                            {isCorrect && (
-                              <span className="flex items-center text-xs font-bold text-emerald-400 gap-1 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30">
-                                <CheckCircle2 className="w-3.5 h-3.5" /> 정답
-                              </span>
-                            )}
-                            {isWrong && (
-                              <span className="flex items-center text-xs font-bold text-rose-400 gap-1 bg-rose-500/10 px-2.5 py-1 rounded-md border border-rose-500/30">
-                                <XCircle className="w-3.5 h-3.5" /> 오답
-                              </span>
-                            )}
-                            {!isAnswered && (
-                              <span className="text-xs text-slate-500">미응답</span>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                                        {/* EASY CONCEPT CARD */}
+                                        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 space-y-3">
+                                            <h3 className="text-lg font-bold text-emerald-400 flex items-center gap-2">
+                                                🌱 쉬운 핵심 개념 요약
+                                            </h3>
+                                            <pre className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap font-sans">
+                                                {currentTopic.easy}
+                                            </pre>
+                                        </div>
 
-                      {/* QUESTION BODY */}
-                      <div className="text-sm md:text-base font-semibold text-slate-100 whitespace-pre-line mb-4">
-                        {quiz.question}
-                      </div>
+                                        {/* DEEP DIVE CONCEPT CARD */}
+                                        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 space-y-3">
+                                            <h3 className="text-lg font-bold text-amber-400 flex items-center gap-2">
+                                                🚀 교과서 심화 깊이보기
+                                            </h3>
+                                            <pre className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap font-sans">
+                                                {currentTopic.detail}
+                                            </pre>
+                                        </div>
 
-                      {/* OPTIONS FOR MULTIPLE CHOICE / CODE PREDICTION */}
-                      {quiz.options && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
-                          {quiz.options.map((opt, optIdx) => {
-                            const isSelected = userAnswers[quiz.id] === optIdx;
-                            let btnStyle = 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700';
-
-                            if (quizSubmitted) {
-                              if (optIdx === quiz.answer) {
-                                btnStyle = 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold';
-                              } else if (isSelected && optIdx !== quiz.answer) {
-                                btnStyle = 'bg-rose-500/20 border-rose-500 text-rose-300';
-                              }
-                            } else if (isSelected) {
-                              btnStyle = 'bg-purple-500/20 border-purple-500 text-purple-300 font-bold shadow-md shadow-purple-500/10';
-                            }
-
-                            return (
-                              <button
-                                key={optIdx}
-                                onClick={() => handleSelectAnswer(quiz.id, optIdx)}
-                                disabled={quizSubmitted}
-                                className={`text-left p-3 rounded-xl border text-xs md:text-sm font-mono transition-all flex items-center justify-between ${btnStyle}`}
-                              >
-                                <span>{optIdx + 1}. {opt}</span>
-                                {isSelected && !quizSubmitted && (
-                                  <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                                        {/* CODE EXAMPLE */}
+                                        <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
+                                            <div className="bg-slate-900 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-400">
+                                                example.py
+                                            </div>
+                                            <pre className="p-4 text-xs md:text-sm font-mono text-cyan-300 overflow-x-auto">
+                                                <code>{currentTopic.code}</code>
+                                            </pre>
+                                        </div>
+                                    </div>
                                 )}
-                              </button>
-                            );
-                          })}
+
+                                {/* TAB 2: QUIZZES */}
+                                {activeTab === 'quiz' && (
+                                    <div className="space-y-6">
+                                        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                            <div>
+                                                <h3 className="text-base font-bold text-white">{currentTopic.title} 퀴즈 (20문항)</h3>
+                                                <p className="text-xs text-slate-400">답변 작성: {Object.keys(userAnswers).length} / 20</p>
+                                            </div>
+
+                                            <div className="flex items-center space-x-3">
+                                                <div className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-cyan-400">
+                                                    ⏱️ {Math.floor(timer/60).toString().padStart(2,'0')}:{(timer%60).toString().padStart(2,'0')}
+                                                </div>
+                                                {!quizSubmitted ? (
+                                                    <button
+                                                        onClick={() => setQuizSubmitted(true)}
+                                                        disabled={Object.keys(userAnswers).length === 0}
+                                                        className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-pink-600 text-slate-950 font-bold text-xs hover:brightness-110 disabled:opacity-40"
+                                                    >
+                                                        결과 제출
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => { setUserAnswers({}); setQuizSubmitted(false); setTimer(0); }}
+                                                        className="px-4 py-1.5 rounded-lg bg-slate-800 text-slate-200 text-xs font-bold hover:bg-slate-700"
+                                                    >
+                                                        다시 풀기
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* SCORE REPORT */}
+                                        {quizSubmitted && (
+                                            <div className="bg-gradient-to-r from-purple-950/80 to-slate-950 border border-purple-500/40 rounded-2xl p-6 text-center space-y-2">
+                                                <h4 className="text-lg font-bold text-white">퀴즈 점수 결과</h4>
+                                                <p className="text-3xl font-black text-cyan-400">{calculateScore()} / 20 점</p>
+                                                <p className="text-xs text-slate-400">정답률: {Math.round((calculateScore() / 20) * 100)}%</p>
+                                            </div>
+                                        )}
+
+                                        {/* QUIZ FILTER */}
+                                        <div className="flex space-x-2 border-b border-slate-800 pb-3">
+                                            {[{k:'all',l:'전체'}, {k:'mc',l:'객관식'}, {k:'tf',l:'O/X'}, {k:'code',l:'코드예측'}].map(f => (
+                                                <button
+                                                    key={f.k}
+                                                    onClick={() => setQuizFilter(f.k)}
+                                                    className={`px-3 py-1 rounded-lg text-xs font-semibold ${quizFilter === f.k ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'text-slate-400 bg-slate-950'}`}
+                                                >
+                                                    {f.l}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* QUESTION LIST */}
+                                        <div className="space-y-4">
+                                            {filteredQuizzes.map((q) => {
+                                                const isAnswered = userAnswers[q.id] !== undefined;
+                                                const isCorrect = quizSubmitted && userAnswers[q.id] === q.answer;
+
+                                                return (
+                                                    <div key={q.id} className={`bg-slate-900/60 border rounded-2xl p-5 space-y-3 ${quizSubmitted ? (isCorrect ? 'border-emerald-500/40' : 'border-rose-500/40') : 'border-slate-800'}`}>
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="font-bold font-mono text-cyan-400">Q{q.id}. [{q.type.toUpperCase()}]</span>
+                                                            {quizSubmitted && (
+                                                                <span className={isCorrect ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                                                                    {isCorrect ? '✓ 정답' : '✗ 오답'}
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <p className="text-sm font-semibold text-slate-100 whitespace-pre-line">{q.question}</p>
+
+                                                        {/* OPTIONS */}
+                                                        {q.options && (
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                                {q.options.map((opt, oIdx) => {
+                                                                    const selected = userAnswers[q.id] === oIdx;
+                                                                    let btnClass = 'bg-slate-950 border-slate-800 text-slate-300';
+                                                                    if (quizSubmitted) {
+                                                                        if (oIdx === q.answer) btnClass = 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold';
+                                                                        else if (selected) btnClass = 'bg-rose-500/20 border-rose-500 text-rose-300';
+                                                                    } else if (selected) {
+                                                                        btnClass = 'bg-purple-500/20 border-purple-500 text-purple-300 font-bold';
+                                                                    }
+
+                                                                    return (
+                                                                        <button
+                                                                            key={oIdx}
+                                                                            onClick={() => handleSelectAnswer(q.id, oIdx)}
+                                                                            className={`text-left p-2.5 rounded-xl border text-xs font-mono transition ${btnClass}`}
+                                                                        >
+                                                                            {oIdx + 1}. {opt}
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
+
+                                                        {q.type === 'tf' && (
+                                                            <div className="grid grid-cols-2 gap-3">
+                                                                {[true, false].map((tfVal) => {
+                                                                    const selected = userAnswers[q.id] === tfVal;
+                                                                    let btnClass = 'bg-slate-950 border-slate-800 text-slate-300';
+                                                                    if (quizSubmitted) {
+                                                                        if (tfVal === q.answer) btnClass = 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold';
+                                                                        else if (selected) btnClass = 'bg-rose-500/20 border-rose-500 text-rose-300';
+                                                                    } else if (selected) {
+                                                                        btnClass = 'bg-purple-500/20 border-purple-500 text-purple-300 font-bold';
+                                                                    }
+
+                                                                    return (
+                                                                        <button
+                                                                            key={String(tfVal)}
+                                                                            onClick={() => handleSelectAnswer(q.id, tfVal)}
+                                                                            className={`p-2.5 rounded-xl border text-center font-bold text-xs transition ${btnClass}`}
+                                                                        >
+                                                                            {tfVal ? 'TRUE (참)' : 'FALSE (거짓)'}
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
+
+                                                        {/* EXPLANATION */}
+                                                        <div className="pt-2">
+                                                            <button
+                                                                onClick={() => setShowExp(prev => ({ ...prev, [q.id]: !prev[q.id] }))}
+                                                                className="text-[11px] text-cyan-400 hover:underline"
+                                                            >
+                                                                {showExp[q.id] ? '해설 접기' : '정답 및 해설 보기'}
+                                                            </button>
+                                                            {(showExp[q.id] || quizSubmitted) && (
+                                                                <p className="mt-2 text-xs bg-slate-950 p-3 rounded-xl border border-slate-800 text-slate-400">
+                                                                    💡 {q.exp}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* TAB 3: SANDBOX */}
+                                {activeTab === 'sandbox' && (
+                                    <div className="space-y-4">
+                                        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                                            <h3 className="text-sm font-bold text-white">파이썬 라이브 연산 시뮬레이터</h3>
+                                            <button
+                                                onClick={handleRunCode}
+                                                disabled={isExecuting}
+                                                className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 text-xs font-bold hover:brightness-110"
+                                            >
+                                                {isExecuting ? '실행 중...' : '코드 실행 (RUN)'}
+                                            </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                            <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-80">
+                                                <div className="bg-slate-900 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-400">
+                                                    main.py
+                                                </div>
+                                                <textarea
+                                                    value={sandboxCode}
+                                                    onChange={(e) => setSandboxCode(e.target.value)}
+                                                    onKeyDown={handleEditorKeyDown}
+                                                    className="w-full flex-1 p-4 bg-slate-950 text-emerald-400 font-mono text-xs resize-none focus:outline-none"
+                                                    spellCheck="false"
+                                                ></textarea>
+                                            </div>
+
+                                            <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-80">
+                                                <div className="bg-slate-900 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-400">
+                                                    Terminal Console
+                                                </div>
+                                                <div className="w-full flex-1 p-4 font-mono text-xs text-cyan-300 overflow-y-auto whitespace-pre-wrap">
+                                                    {sandboxOutput || "[코드 실행 버튼을 눌러 연산 결과를 확인하세요]"}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                            </main>
                         </div>
-                      )}
-
-                      {/* OPTIONS FOR TRUE / FALSE */}
-                      {quiz.type === 'tf' && (
-                        <div className="grid grid-cols-2 gap-3 mb-3">
-                          {[true, false].map((tfVal) => {
-                            const isSelected = userAnswers[quiz.id] === tfVal;
-                            let btnStyle = 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700';
-
-                            if (quizSubmitted) {
-                              if (tfVal === quiz.answer) {
-                                btnStyle = 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold';
-                              } else if (isSelected && tfVal !== quiz.answer) {
-                                btnStyle = 'bg-rose-500/20 border-rose-500 text-rose-300';
-                              }
-                            } else if (isSelected) {
-                              btnStyle = 'bg-purple-500/20 border-purple-500 text-purple-300 font-bold';
-                            }
-
-                            return (
-                              <button
-                                key={String(tfVal)}
-                                onClick={() => handleSelectAnswer(quiz.id, tfVal)}
-                                disabled={quizSubmitted}
-                                className={`p-3 rounded-xl border text-center font-bold text-sm transition-all ${btnStyle}`}
-                              >
-                                {tfVal ? 'TRUE (참)' : 'FALSE (거짓)'}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {/* EXPLANATION TOGGLE */}
-                      <div className="mt-3 pt-3 border-t border-slate-800/60 flex flex-col space-y-2">
-                        <button
-                          onClick={() => setShowExplanation(prev => ({ ...prev, [quiz.id]: !prev[quiz.id] }))}
-                          className="self-start text-xs text-cyan-400 hover:underline flex items-center gap-1"
-                        >
-                          <HelpCircle className="w-3.5 h-3.5" />
-                          <span>{showExplanation[quiz.id] ? '해설 접기' : '정답 및 상세 해설 보기'}</span>
-                        </button>
-
-                        {(showExplanation[quiz.id] || quizSubmitted) && (
-                          <div className="p-3 rounded-xl bg-slate-950/90 border border-cyan-500/20 text-xs text-slate-300 leading-relaxed space-y-1">
-                            <p className="font-bold text-cyan-400 flex items-center gap-1">
-                              💡 개념 정답해설:
-                            </p>
-                            <p>{quiz.exp}</p>
-                          </div>
-                        )}
-                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
-          {/* TAB 3: CODE SANDBOX / LIVE SIMULATOR */}
-          {activeTab === 'sandbox' && (
-            <div className="space-y-4">
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="flex items-center space-x-2">
-                  <Terminal className="w-5 h-5 text-emerald-400" />
-                  <div>
-                    <h3 className="text-sm font-bold text-white">파이썬 라이브 코드 샌드박스</h3>
-                    <p className="text-xs text-slate-400">코드를 직접 수정하고 실행해 결과를 확인해 보세요.</p>
-                  </div>
+                    {/* FOOTER */}
+                    <footer className="border-t border-slate-800 bg-slate-950 py-4 text-center text-xs text-slate-500 font-mono">
+                        Copyright 2026. HDA All rights reserved.
+                    </footer>
                 </div>
+            );
+        }
 
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setSandboxCode(CODE_TEMPLATES[currentTopicId] || '')}
-                    className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 transition-colors"
-                  >
-                    템플릿 리셋
-                  </button>
-                  <button
-                    onClick={handleRunCode}
-                    disabled={isExecuting}
-                    className="px-5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 text-xs font-extrabold hover:brightness-110 shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 transition-all"
-                  >
-                    <Play className="w-4 h-4 fill-slate-950" />
-                    <span>{isExecuting ? '실행 중...' : '코드 실행 (RUN)'}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* EDITOR & OUTPUT GRID */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                
-                {/* CODE EDITOR INPUT */}
-                <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-96">
-                  <div className="bg-slate-900 px-4 py-2 border-b border-slate-800 flex justify-between items-center text-xs font-mono text-slate-400">
-                    <span>main.py (Python 3.x Sandbox)</span>
-                    <span className="text-[10px] text-emerald-400 font-bold">Interactive</span>
-                  </div>
-                  <textarea
-                    value={sandboxCode}
-                    onChange={(e) => setSandboxCode(e.target.value)}
-                    className="w-full flex-1 p-4 bg-slate-950 text-emerald-400 font-mono text-xs md:text-sm resize-none focus:outline-none selection:bg-emerald-500/30 leading-relaxed"
-                    placeholder="파이썬 코드를 작성하세요..."
-                    spellCheck="false"
-                  ></textarea>
-                </div>
-
-                {/* TERMINAL OUTPUT PREVIEW */}
-                <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-96 shadow-inner">
-                  <div className="bg-slate-900 px-4 py-2 border-b border-slate-800 flex justify-between items-center text-xs font-mono text-slate-400">
-                    <span className="flex items-center gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-                      Console Output Terminal
-                    </span>
-                    <button
-                      onClick={() => setSandboxOutput('')}
-                      className="text-[10px] hover:text-slate-200"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                  <div className="w-full flex-1 p-4 font-mono text-xs md:text-sm text-cyan-300 overflow-y-auto whitespace-pre-wrap leading-relaxed bg-slate-950/90">
-                    {sandboxOutput ? (
-                      sandboxOutput
-                    ) : (
-                      <span className="text-slate-600 italic">
-                        [상단의 '코드 실행' 버튼을 누르면 콘솔 결과가 표시됩니다.]
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          )}
-
-        </main>
-      </div>
-
-      {/* FOOTER WITH EXACT COPYRIGHT REQUIREMENT */}
-      <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/90 py-4 px-6 text-center text-xs text-slate-500 font-mono">
-        <p>Copyright 2026. HDA All rights reserved.</p>
-      </footer>
-
-    </div>
-  );
-}
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
